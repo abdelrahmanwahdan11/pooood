@@ -1,0 +1,48 @@
+{
+  "appName": "Nearby Auctions",
+  "continue": "Continue",
+  "start": "Get Started",
+  "next": "Next",
+  "skip": "Skip",
+  "language": {
+    "title": "Choose your language",
+    "subtitle": "Switch anytime from settings.",
+    "arabic": "Arabic",
+    "english": "English"
+  },
+  "onboarding": {
+    "title1": "Auctions around you",
+    "desc1": "Discover live auctions nearby with real-time updates and countdowns.",
+    "title2": "Flash discounts",
+    "desc2": "Catch limited-time deals before they vanish and save your favorites.",
+    "title3": "Smart favorites",
+    "desc3": "Receive alerts when saved items enter a new auction or discount."
+  },
+  "auth": {
+    "title": "Join the community",
+    "subtitle": "Sign in to sync your preferences and bidding activity.",
+    "name": "Full name",
+    "email": "Email address",
+    "phone": "Phone number",
+    "signup": "Create account",
+    "login": "Log in",
+    "haveAccount": "Already have an account?",
+    "noAccount": "New here?"
+  },
+  "home": {
+    "auctions": "Auctions",
+    "discounts": "Discounts",
+    "favorites": "Favorites",
+    "profile": "Profile"
+  },
+  "profile": {
+    "language": "Language",
+    "notifications": "Notifications",
+    "location": "Location",
+    "about": "About app"
+  },
+  "common": {
+    "loading": "Loading...",
+    "unknown": "Unknown"
+  }
+}
