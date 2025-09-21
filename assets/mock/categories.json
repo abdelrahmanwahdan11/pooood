@@ -1,0 +1,6 @@
+[
+  {"id": "phones", "name": "Smartphones", "icon": "devices"},
+  {"id": "laptops", "name": "Laptops", "icon": "laptop"},
+  {"id": "audio", "name": "Audio", "icon": "headphones"},
+  {"id": "gaming", "name": "Gaming", "icon": "sports_esports"}
+]

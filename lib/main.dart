@@ -1,46 +1,98 @@
+/*
+README - Trend Electronics Store (Flutter GetX)
+================================================
+1. Install Flutter 3.19+ and run `flutter pub get`.
+2. Run locally:
+   - Mobile: `flutter run` (select device).
+   - Web (Instagram optimized): `flutter run -d chrome --web-renderer html`.
+3. Build release web:
+   - `flutter build web --web-renderer html --release`
+4. Build mobile release: standard `flutter build apk` / `flutter build ios`.
+5. Mock data lives in assets/mock/*.json. Update freely.
+6. Localization is handled via GetX translations in lib/core/translations/app_translations.dart.
+7. Services and controllers are wired via GlobalBindings (GetX dependency injection).
+8. Firebase / TensorFlow Lite integrations are stubbed with TODO comments in related services and controllers.
+*/
+
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
-import 'app/core/bindings.dart';
-import 'app/core/services/locale_service.dart';
-import 'app/localization/translations.dart';
-import 'app/routes/app_pages.dart';
-import 'app/theme/app_theme.dart';
+import 'core/bindings/global_bindings.dart';
+import 'core/routing/app_pages.dart';
+import 'core/routing/app_routes.dart';
+import 'core/theme/glass_theme.dart';
+import 'core/translations/app_translations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  final translations = await AppTranslations.load();
+  final storage = GetStorage();
+  final storedLocale = storage.read<String>('locale');
+  final deviceLocale = Get.deviceLocale ?? const Locale('en');
+  final locale = storedLocale != null
+      ? Locale(storedLocale)
+      : deviceLocale.languageCode == 'ar'
+          ? const Locale('ar')
+          : const Locale('en');
+  final initialRoute = storage.read<bool>('onboarded') == true
+      ? AppRoutes.home
+      : AppRoutes.onboarding;
 
-  final localeService = Get.put(LocaleService(), permanent: true);
-  await localeService.init();
-
-  runApp(AppBootstrap(translations: translations));
+  // For Flutter web inside Instagram WebView ensure HTML renderer.
+  // Build tip (release): flutter build web --web-renderer html --release
+  runZonedGuarded(
+    () => runApp(TrendElectronicsApp(
+      initialLocale: locale,
+      initialRoute: initialRoute,
+    )),
+    (error, stack) {
+      if (kDebugMode) {
+        debugPrint('Unhandled error: $error');
+      }
+    },
+  );
 }
 
-class AppBootstrap extends StatelessWidget {
-  const AppBootstrap({super.key, required this.translations});
+class TrendElectronicsApp extends StatelessWidget {
+  const TrendElectronicsApp({
+    super.key,
+    required this.initialLocale,
+    required this.initialRoute,
+  });
 
-  final AppTranslations translations;
+  final Locale initialLocale;
+  final String initialRoute;
 
   @override
   Widget build(BuildContext context) {
-    final localeService = Get.find<LocaleService>();
-    return Obx(
-      () => GetMaterialApp(
-        title: 'Nearby Auctions',
-        debugShowCheckedModeBanner: false,
-        translations: translations,
-        locale: localeService.locale,
-        fallbackLocale: AppTranslations.fallbackLocale,
-        initialRoute: AppPages.initial,
-        initialBinding: InitialBindings(),
-        getPages: AppPages.routes,
-        theme: AppTheme.lightTheme(localeService.locale),
-        darkTheme: AppTheme.darkTheme(localeService.locale),
-        themeMode: ThemeMode.system,
-      ),
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Trend Electronics',
+      translations: AppTranslations(),
+      locale: initialLocale,
+      fallbackLocale: const Locale('en'),
+      supportedLocales: const [Locale('en'), Locale('ar')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      theme: GlassTheme.light,
+      darkTheme: GlassTheme.dark,
+      themeMode: ThemeMode.system,
+      defaultTransition: Transition.cupertino,
+      initialRoute: initialRoute,
+      getPages: AppPages.routes,
+      initialBinding: GlobalBindings(),
+      routingCallback: (routing) {
+        if (kDebugMode && routing?.current != null) {
+          debugPrint('Navigated to: ${routing!.current}');
+        }
+      },
     );
   }
 }

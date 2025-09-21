@@ -1,0 +1,23 @@
+[
+  {
+    "id": "d1",
+    "productId": "p1",
+    "discountPct": 15,
+    "endAt": "2025-09-21T16:40:08.874922",
+    "region": "mena"
+  },
+  {
+    "id": "d2",
+    "productId": "p2",
+    "discountPct": 10,
+    "endAt": "2025-09-21T20:40:08.874922",
+    "region": "global"
+  },
+  {
+    "id": "d3",
+    "productId": "p3",
+    "discountPct": 20,
+    "endAt": "2025-09-21T17:40:08.874922",
+    "region": "usa"
+  }
+]

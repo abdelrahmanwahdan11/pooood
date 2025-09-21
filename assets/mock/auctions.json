@@ -1,0 +1,26 @@
+[
+  {
+    "id": "a1",
+    "productId": "p4",
+    "currentBid": 720,
+    "endAt": "2025-09-21T18:40:05.209672",
+    "biddersCount": 14,
+    "history": [
+      {"user": "Maya", "amount": 700, "time": "10:05"},
+      {"user": "Omar", "amount": 710, "time": "10:12"},
+      {"user": "Lina", "amount": 720, "time": "10:20"}
+    ]
+  },
+  {
+    "id": "a2",
+    "productId": "p1",
+    "currentBid": 1050,
+    "endAt": "2025-09-22T00:40:05.209672",
+    "biddersCount": 9,
+    "history": [
+      {"user": "Sara", "amount": 1030, "time": "09:45"},
+      {"user": "Noah", "amount": 1040, "time": "09:58"},
+      {"user": "Ali", "amount": 1050, "time": "10:10"}
+    ]
+  }
+]
