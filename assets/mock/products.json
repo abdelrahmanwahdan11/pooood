@@ -1,0 +1,68 @@
+[
+  {
+    "id": "p1",
+    "title": "NovaEdge Pro 6G Smartphone",
+    "brand": "NovaEdge",
+    "categoryId": "phones",
+    "images": [
+      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
+      "https://images.unsplash.com/photo-1523475472560-d2df97ec485c"
+    ],
+    "priceApprox": 999,
+    "rating": 4.8,
+    "trendingScore": 92,
+    "locations": [
+      {"id": "s1", "name": "Trend Hub Riyadh", "lat": 24.7136, "lng": 46.6753, "availability": true, "price": 995},
+      {"id": "s2", "name": "MegaTech Dubai", "lat": 25.2048, "lng": 55.2708, "availability": true, "price": 1005}
+    ]
+  },
+  {
+    "id": "p2",
+    "title": "AeroBook X Ultra Laptop",
+    "brand": "AeroTech",
+    "categoryId": "laptops",
+    "images": [
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8",
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c"
+    ],
+    "priceApprox": 1799,
+    "rating": 4.7,
+    "trendingScore": 88,
+    "locations": [
+      {"id": "s1", "name": "Trend Hub Riyadh", "lat": 24.7136, "lng": 46.6753, "availability": true, "price": 1780},
+      {"id": "s3", "name": "Circuit City Jeddah", "lat": 21.4858, "lng": 39.1925, "availability": false, "price": 1820}
+    ]
+  },
+  {
+    "id": "p3",
+    "title": "PulseBand Studio Wireless Headphones",
+    "brand": "PulseBand",
+    "categoryId": "audio",
+    "images": [
+      "https://images.unsplash.com/photo-1519677100203-a0e668c92439"
+    ],
+    "priceApprox": 299,
+    "rating": 4.6,
+    "trendingScore": 85,
+    "locations": [
+      {"id": "s2", "name": "MegaTech Dubai", "lat": 25.2048, "lng": 55.2708, "availability": true, "price": 289},
+      {"id": "s4", "name": "Electro Mall Cairo", "lat": 30.0444, "lng": 31.2357, "availability": true, "price": 305}
+    ]
+  },
+  {
+    "id": "p4",
+    "title": "QuantumPlay RTX Console",
+    "brand": "QuantumPlay",
+    "categoryId": "gaming",
+    "images": [
+      "https://images.unsplash.com/photo-1606813909355-726f4baf7c08"
+    ],
+    "priceApprox": 649,
+    "rating": 4.5,
+    "trendingScore": 90,
+    "locations": [
+      {"id": "s5", "name": "NextGen Kuwait", "lat": 29.3759, "lng": 47.9774, "availability": true, "price": 640},
+      {"id": "s2", "name": "MegaTech Dubai", "lat": 25.2048, "lng": 55.2708, "availability": true, "price": 655}
+    ]
+  }
+]

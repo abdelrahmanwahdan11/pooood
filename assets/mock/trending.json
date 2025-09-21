@@ -1,0 +1,6 @@
+[
+  {"productId": "p1", "categoryId": "phones", "score": 92},
+  {"productId": "p2", "categoryId": "laptops", "score": 88},
+  {"productId": "p3", "categoryId": "audio", "score": 85},
+  {"productId": "p4", "categoryId": "gaming", "score": 90}
+]

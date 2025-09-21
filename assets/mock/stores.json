@@ -1,0 +1,7 @@
+[
+  {"id": "s1", "name": "Trend Hub Riyadh", "lat": 24.7136, "lng": 46.6753, "availability": true, "price": 995},
+  {"id": "s2", "name": "MegaTech Dubai", "lat": 25.2048, "lng": 55.2708, "availability": true, "price": 1005},
+  {"id": "s3", "name": "Circuit City Jeddah", "lat": 21.4858, "lng": 39.1925, "availability": false, "price": 1820},
+  {"id": "s4", "name": "Electro Mall Cairo", "lat": 30.0444, "lng": 31.2357, "availability": true, "price": 305},
+  {"id": "s5", "name": "NextGen Kuwait", "lat": 29.3759, "lng": 47.9774, "availability": true, "price": 640}
+]
