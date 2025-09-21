@@ -1,193 +1,160 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../core/theme/green_theme.dart';
 import '../../core/widgets/app_button.dart';
-import '../../core/widgets/glass_container.dart';
+import '../../core/widgets/gradient_scaffold.dart';
 import 'onboarding_controller.dart';
 
 class OnboardingView extends GetView<OnboardingController> {
   const OnboardingView({super.key});
 
+  List<_OnboardingSlide> _slides(BuildContext context) => [
+        _OnboardingSlide(
+          title: 'onboarding_title'.tr,
+          subtitle: 'onboarding_subtitle'.tr,
+          icon: Icons.gavel,
+        ),
+        _OnboardingSlide(
+          title: 'pricing'.tr,
+          subtitle: 'pricing_hint'.tr,
+          icon: Icons.price_change,
+        ),
+        _OnboardingSlide(
+          title: 'settings'.tr,
+          subtitle: 'notifications'.tr,
+          icon: Icons.auto_awesome,
+        ),
+      ];
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    const pages = [
-      _OnboardingPageData(
-        titleKey: 'onboarding_title_1',
-        bodyKey: 'onboarding_body_1',
-        icon: Icons.trending_up,
-      ),
-      _OnboardingPageData(
-        titleKey: 'onboarding_title_2',
-        bodyKey: 'onboarding_body_2',
-        icon: Icons.gavel_rounded,
-      ),
-      _OnboardingPageData(
-        titleKey: 'onboarding_title_3',
-        bodyKey: 'onboarding_body_3',
-        icon: Icons.flash_on_rounded,
-      ),
-    ];
+    final slides = _slides(context);
+    final pageController = PageController();
 
-    return Directionality(
-      textDirection: Get.locale?.languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr,
-      child: Scaffold(
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF1F2A44), Color(0xFF304361), Color(0xFF0F172A)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('app_title'.tr, style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white)),
-                      TextButton(
-                        onPressed: controller.skip,
-                        child: Text('skip'.tr, style: const TextStyle(color: Colors.white70)),
-                      ),
-                    ],
-                  ),
+    return GradientScaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: TextButton(
+                onPressed: controller.skip,
+                child: Text(
+                  'skip'.tr,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(color: Colors.white),
                 ),
-                Expanded(
-                  child: PageView.builder(
-                    controller: controller.pageController,
-                    onPageChanged: controller.onPageChanged,
-                    itemCount: pages.length,
-                    itemBuilder: (context, index) => _OnboardingPage(
-                      titleKey: pages[index].titleKey,
-                      bodyKey: pages[index].bodyKey,
-                      icon: pages[index].icon,
+              ),
+            ),
+            Expanded(
+              child: PageView.builder(
+                controller: pageController,
+                itemCount: slides.length,
+                onPageChanged: controller.changePage,
+                itemBuilder: (context, index) {
+                  final slide = slides[index];
+                  return _OnboardingContent(slide: slide);
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+            Obx(
+              () => Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(slides.length, (index) {
+                  final isActive = controller.currentPage.value == index;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    width: isActive ? 20 : 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(999),
+                      color: isActive
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.5),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    children: [
-                      Obx(
-                        () => Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            pages.length,
-                            (index) => AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: controller.currentPage.value == index ? 24 : 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: controller.currentPage.value == index
-                                    ? Colors.white
-                                    : Colors.white.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      GlassContainer(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          children: [
-                            Text('choose_language'.tr, style: theme.textTheme.titleMedium?.copyWith(color: Colors.white)),
-                            const SizedBox(height: 12),
-                            Wrap(
-                              alignment: WrapAlignment.center,
-                              spacing: 12,
-                              children: [
-                                AppButton(
-                                  label: 'English',
-                                  onPressed: () => controller.changeLocale('en'),
-                                ),
-                                AppButton(
-                                  label: 'العربية',
-                                  onPressed: () => controller.changeLocale('ar'),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Obx(
-                        () => AppButton(
-                          label: controller.currentPage.value == pages.length - 1 ? 'get_started'.tr : 'next'.tr,
-                          onPressed: controller.next,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                  ),
-                ),
-              ],
+                  );
+                }),
+              ),
             ),
-          ),
+            const SizedBox(height: 24),
+            AppButton(
+              label: 'get_started'.tr,
+              isExpanded: true,
+              onPressed: controller.completeOnboarding,
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _OnboardingPageData {
-  const _OnboardingPageData({
-    required this.titleKey,
-    required this.bodyKey,
+class _OnboardingSlide {
+  _OnboardingSlide({
+    required this.title,
+    required this.subtitle,
     required this.icon,
   });
 
-  final String titleKey;
-  final String bodyKey;
+  final String title;
+  final String subtitle;
   final IconData icon;
 }
 
-class _OnboardingPage extends StatelessWidget {
-  const _OnboardingPage({
-    required this.titleKey,
-    required this.bodyKey,
-    required this.icon,
-  });
+class _OnboardingContent extends StatelessWidget {
+  const _OnboardingContent({required this.slide});
 
-  final String titleKey;
-  final String bodyKey;
-  final IconData icon;
+  final _OnboardingSlide slide;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Column(
-        children: [
-          Expanded(
-            child: GlassContainer(
-              style: const GlassContainerStyle(blur: 40, opacity: 0.2),
-              child: Center(
-                child: Icon(
-                  icon,
-                  size: 120,
-                  color: Colors.white70,
-                ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: GreenTheme.primaryGradient,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 24),
-          Text(titleKey.tr, style: theme.textTheme.headlineMedium?.copyWith(color: Colors.white), textAlign: TextAlign.center),
-          const SizedBox(height: 12),
-          Text(
-            bodyKey.tr,
-            style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white70),
-            textAlign: TextAlign.center,
+          child: Icon(
+            slide.icon,
+            size: 64,
+            color: Colors.white,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 32),
+        Text(
+          slide.title,
+          textAlign: TextAlign.center,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          slide.subtitle,
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: Colors.white.withOpacity(0.9),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,34 +1,22 @@
-import '../data/datasources/local/get_storage_ds.dart';
-import '../data/models/user_alert.dart';
+import 'package:get/get.dart';
 
-class NotificationService {
-  NotificationService({required this.localDataSource});
-
-  final GetStorageDataSource localDataSource;
-
-  List<UserAlert> getAlerts() => localDataSource.alerts;
-
-  void upsertAlert(UserAlert alert) {
-    final alerts = getAlerts();
-    final index = alerts.indexWhere((a) => a.id == alert.id);
-    if (index >= 0) {
-      alerts[index] = alert;
-    } else {
-      alerts.add(alert);
-    }
-    localDataSource.saveAlerts(alerts);
+class NotificationService extends GetxService {
+  Future<NotificationService> init() async {
+    // TODO: FCM setup steps
+    // 1) Add firebase_core and firebase_messaging to pubspec.
+    // 2) Configure Firebase options via flutterfire configure.
+    // 3) Request notification permissions on iOS/web.
+    // 4) Subscribe users to topics such as `target-price-<productId>`.
+    // 5) Trigger Cloud Functions when bids surpass user thresholds to
+    //    send push notifications.
+    return this;
   }
 
-  void removeAlert(String id) {
-    final alerts = getAlerts();
-    alerts.removeWhere((element) => element.id == id);
-    localDataSource.saveAlerts(alerts);
+  Future<void> showLocalMockNotification({
+    required String title,
+    required String body,
+  }) async {
+    // Placeholder for local notifications if integrated in future.
+    Get.log('[Notification] $title -> $body');
   }
-
-  // TODO: Firebase
-  // 1) إضافة حزم firebase_core, firebase_messaging, cloud_firestore إلى pubspec.
-  // 2) إنشاء firebase_options.dart عبر `flutterfire configure` وتحديث main.dart للتهيئة.
-  // 3) حفظ تنبيهات السعر داخل مجموعة Firestore مثل `users/{uid}/alerts/{alertId}`.
-  // 4) ضبط قواعد الأمان للسماح بالوصول المقيد للمستخدم المسجّل فقط.
-  // 5) إنشاء Cloud Function مجدولة تتحقق من الأسعار وتستدعي Firebase Cloud Messaging عندما price <= targetPrice.
 }

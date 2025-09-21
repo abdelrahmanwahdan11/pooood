@@ -1,0 +1,30 @@
+[
+  {
+    "id": "bid-1001",
+    "auctionId": "auction-1",
+    "amount": 310.0,
+    "userId": "user-greenfox",
+    "placedAt": "2025-07-18T18:30:00Z"
+  },
+  {
+    "id": "bid-1002",
+    "auctionId": "auction-1",
+    "amount": 320.0,
+    "userId": "user-mintwave",
+    "placedAt": "2025-07-18T19:10:00Z"
+  },
+  {
+    "id": "bid-1003",
+    "auctionId": "auction-2",
+    "amount": 180.0,
+    "userId": "user-aurora",
+    "placedAt": "2025-07-17T15:05:00Z"
+  },
+  {
+    "id": "bid-1004",
+    "auctionId": "auction-3",
+    "amount": 930.0,
+    "userId": "user-lensleaf",
+    "placedAt": "2025-07-16T09:15:00Z"
+  }
+]
