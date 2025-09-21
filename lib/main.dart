@@ -1,30 +1,28 @@
 /*
-README - Trend Electronics Store (Flutter GetX)
-================================================
+README - Green Auction App (Flutter + GetX)
+=========================================
 1. Install Flutter 3.19+ and run `flutter pub get`.
-2. Run locally:
-   - Mobile: `flutter run` (select device).
+2. Run on devices:
+   - Android/iOS: `flutter run` (select device or emulator).
    - Web (Instagram optimized): `flutter run -d chrome --web-renderer html`.
 3. Build release web:
    - `flutter build web --web-renderer html --release`
-4. Build mobile release: standard `flutter build apk` / `flutter build ios`.
-5. Mock data lives in assets/mock/*.json. Update freely.
-6. Localization is handled via GetX translations in lib/core/translations/app_translations.dart.
-7. Services and controllers are wired via GlobalBindings (GetX dependency injection).
-8. Firebase / TensorFlow Lite integrations are stubbed with TODO comments in related services and controllers.
+4. Build mobile release:
+   - `flutter build apk --release` / `flutter build ios --release`
+5. Mock data lives in assets/mock/*.json and assets/i18n for translations.
+6. All state management, routing, and localization is powered by GetX.
+7. Firebase / TensorFlow integrations are documented via TODO comments inside the relevant services and controllers.
 */
 
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+
 import 'core/bindings/global_bindings.dart';
 import 'core/routing/app_pages.dart';
 import 'core/routing/app_routes.dart';
-import 'core/theme/glass_theme.dart';
+import 'core/theme/green_theme.dart';
 import 'core/translations/app_translations.dart';
 
 Future<void> main() async {
@@ -33,32 +31,29 @@ Future<void> main() async {
   final storage = GetStorage();
   final storedLocale = storage.read<String>('locale');
   final deviceLocale = Get.deviceLocale ?? const Locale('en');
-  final locale = storedLocale != null
-      ? Locale(storedLocale)
-      : deviceLocale.languageCode == 'ar'
-          ? const Locale('ar')
-          : const Locale('en');
-  final initialRoute = storage.read<bool>('onboarded') == true
+  final Locale initialLocale;
+  if (storedLocale != null) {
+    initialLocale = Locale(storedLocale);
+  } else {
+    initialLocale = deviceLocale.languageCode == 'ar'
+        ? const Locale('ar')
+        : const Locale('en');
+  }
+  final initialRoute = storage.read<bool>('onboarding_complete') == true
       ? AppRoutes.home
       : AppRoutes.onboarding;
 
-  // For Flutter web inside Instagram WebView ensure HTML renderer.
-  // Build tip (release): flutter build web --web-renderer html --release
-  runZonedGuarded(
-    () => runApp(TrendElectronicsApp(
-      initialLocale: locale,
+  // BUILD WEB: flutter build web --web-renderer html --release
+  runApp(
+    GreenAuctionApp(
+      initialLocale: initialLocale,
       initialRoute: initialRoute,
-    )),
-    (error, stack) {
-      if (kDebugMode) {
-        debugPrint('Unhandled error: $error');
-      }
-    },
+    ),
   );
 }
 
-class TrendElectronicsApp extends StatelessWidget {
-  const TrendElectronicsApp({
+class GreenAuctionApp extends StatelessWidget {
+  const GreenAuctionApp({
     super.key,
     required this.initialLocale,
     required this.initialRoute,
@@ -71,7 +66,7 @@ class TrendElectronicsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Trend Electronics',
+      title: 'Green Auction',
       translations: AppTranslations(),
       locale: initialLocale,
       fallbackLocale: const Locale('en'),
@@ -81,18 +76,13 @@ class TrendElectronicsApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: GlassTheme.light,
-      darkTheme: GlassTheme.dark,
+      theme: GreenTheme.light,
+      darkTheme: GreenTheme.dark,
       themeMode: ThemeMode.system,
-      defaultTransition: Transition.cupertino,
       initialRoute: initialRoute,
       getPages: AppPages.routes,
       initialBinding: GlobalBindings(),
-      routingCallback: (routing) {
-        if (kDebugMode && routing?.current != null) {
-          debugPrint('Navigated to: ${routing!.current}');
-        }
-      },
+      defaultTransition: Transition.cupertino,
     );
   }
 }

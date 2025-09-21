@@ -1,26 +1,44 @@
 [
   {
-    "id": "a1",
-    "productId": "p4",
-    "currentBid": 720,
-    "endAt": "2025-09-21T18:40:05.209672",
-    "biddersCount": 14,
-    "history": [
-      {"user": "Maya", "amount": 700, "time": "10:05"},
-      {"user": "Omar", "amount": 710, "time": "10:12"},
-      {"user": "Lina", "amount": 720, "time": "10:20"}
-    ]
+    "id": "auction-1",
+    "productId": "product-1",
+    "title": "Emerald Series Smartwatch 5",
+    "images": [
+      "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+      "https://images.unsplash.com/photo-1523475472560-d2df97ec485c"
+    ],
+    "currentBid": 320.0,
+    "minIncrement": 10.0,
+    "biddersCount": 12,
+    "endAt": "2025-07-20T21:30:00Z",
+    "description": "Limited edition smartwatch with AMOLED display, ECG tracking, and 7-day battery life."
   },
   {
-    "id": "a2",
-    "productId": "p1",
-    "currentBid": 1050,
-    "endAt": "2025-09-22T00:40:05.209672",
-    "biddersCount": 9,
-    "history": [
-      {"user": "Sara", "amount": 1030, "time": "09:45"},
-      {"user": "Noah", "amount": 1040, "time": "09:58"},
-      {"user": "Ali", "amount": 1050, "time": "10:10"}
-    ]
+    "id": "auction-2",
+    "productId": "product-2",
+    "title": "Verdant Noise-Canceling Headphones",
+    "images": [
+      "https://images.unsplash.com/photo-1518444028785-8fbcd101ebb9",
+      "https://images.unsplash.com/photo-1517048676732-d65bc937f952"
+    ],
+    "currentBid": 185.0,
+    "minIncrement": 5.0,
+    "biddersCount": 8,
+    "endAt": "2025-07-18T17:00:00Z",
+    "description": "Over-ear wireless headphones with adaptive noise cancellation and 30-hour playback."
+  },
+  {
+    "id": "auction-3",
+    "productId": "product-3",
+    "title": "Lime Studio Mirrorless Camera",
+    "images": [
+      "https://images.unsplash.com/photo-1519183071298-a2962be90b8e",
+      "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f"
+    ],
+    "currentBid": 950.0,
+    "minIncrement": 25.0,
+    "biddersCount": 5,
+    "endAt": "2025-07-25T10:15:00Z",
+    "description": "24MP APS-C mirrorless camera with dual SD slots, 4K recording, and weather sealing."
   }
 ]

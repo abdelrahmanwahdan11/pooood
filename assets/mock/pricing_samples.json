@@ -1,0 +1,67 @@
+[
+  {
+    "id": "sample-1",
+    "category": "Wearables",
+    "brand": "GreenPulse",
+    "model": "Series 5",
+    "condition": "excellent",
+    "year": 2024,
+    "price": 315.0,
+    "currency": "USD",
+    "confidence": 0.85,
+    "title": "GreenPulse Series 5 Refurbished",
+    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30"
+  },
+  {
+    "id": "sample-2",
+    "category": "Wearables",
+    "brand": "GreenPulse",
+    "model": "Series 4",
+    "condition": "good",
+    "year": 2022,
+    "price": 250.0,
+    "currency": "USD",
+    "confidence": 0.65,
+    "title": "GreenPulse Series 4",
+    "image": "https://images.unsplash.com/photo-1545239351-1141bd82e8a6"
+  },
+  {
+    "id": "sample-3",
+    "category": "Audio",
+    "brand": "AuraSound",
+    "model": "Flow",
+    "condition": "good",
+    "year": 2023,
+    "price": 190.0,
+    "currency": "USD",
+    "confidence": 0.78,
+    "title": "AuraSound Flow ANC",
+    "image": "https://images.unsplash.com/photo-1518444028785-8fbcd101ebb9"
+  },
+  {
+    "id": "sample-4",
+    "category": "Cameras",
+    "brand": "LeafShot",
+    "model": "LS-X",
+    "condition": "excellent",
+    "year": 2023,
+    "price": 980.0,
+    "currency": "USD",
+    "confidence": 0.82,
+    "title": "LeafShot LS-X Mirrorless",
+    "image": "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f"
+  },
+  {
+    "id": "sample-5",
+    "category": "Cameras",
+    "brand": "LeafShot",
+    "model": "LS-Lite",
+    "condition": "good",
+    "year": 2021,
+    "price": 760.0,
+    "currency": "USD",
+    "confidence": 0.7,
+    "title": "LeafShot LS-Lite",
+    "image": "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f"
+  }
+]

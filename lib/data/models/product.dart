@@ -1,56 +1,34 @@
-import 'store_location.dart';
-
 class Product {
-  Product({
+  const Product({
     required this.id,
     required this.title,
     required this.brand,
-    required this.categoryId,
+    required this.category,
     required this.images,
-    required this.priceApprox,
-    required this.rating,
-    required this.locations,
-    this.trendingScore = 0,
+    required this.basePrice,
+    this.condition,
+    this.year,
   });
 
   final String id;
   final String title;
   final String brand;
-  final String categoryId;
+  final String category;
   final List<String> images;
-  final double priceApprox;
-  final double rating;
-  final List<StoreLocation> locations;
-  final double trendingScore;
+  final double basePrice;
+  final String? condition;
+  final int? year;
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'] as String,
       title: json['title'] as String,
       brand: json['brand'] as String,
-      categoryId: json['categoryId'] as String,
+      category: json['category'] as String,
       images: (json['images'] as List<dynamic>).cast<String>(),
-      priceApprox: (json['priceApprox'] as num).toDouble(),
-      rating: (json['rating'] as num).toDouble(),
-      trendingScore: (json['trendingScore'] as num?)?.toDouble() ?? 0,
-      locations: (json['locations'] as List<dynamic>?)
-              ?.map((e) => StoreLocation.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          <StoreLocation>[],
-    );
-  }
-
-  Product copyWith({double? trendingScore}) {
-    return Product(
-      id: id,
-      title: title,
-      brand: brand,
-      categoryId: categoryId,
-      images: images,
-      priceApprox: priceApprox,
-      rating: rating,
-      locations: locations,
-      trendingScore: trendingScore ?? this.trendingScore,
+      basePrice: (json['basePrice'] as num).toDouble(),
+      condition: json['condition'] as String?,
+      year: json['year'] as int?,
     );
   }
 
@@ -58,11 +36,10 @@ class Product {
         'id': id,
         'title': title,
         'brand': brand,
-        'categoryId': categoryId,
+        'category': category,
         'images': images,
-        'priceApprox': priceApprox,
-        'rating': rating,
-        'trendingScore': trendingScore,
-        'locations': locations.map((e) => e.toJson()).toList(),
+        'basePrice': basePrice,
+        'condition': condition,
+        'year': year,
       };
 }
