@@ -1,23 +1,16 @@
 [
   {
-    "id": "d1",
-    "productId": "p1",
+    "id": "deal_001",
+    "productId": "prod_002",
+    "discountPct": 25,
+    "endsAt": "2024-04-11T22:00:00Z",
+    "location": { "lat": 25.276987, "lng": 55.296249, "geohash": "thqtv3" }
+  },
+  {
+    "id": "deal_002",
+    "productId": "prod_003",
     "discountPct": 15,
-    "endAt": "2025-09-21T16:40:08.874922",
-    "region": "mena"
-  },
-  {
-    "id": "d2",
-    "productId": "p2",
-    "discountPct": 10,
-    "endAt": "2025-09-21T20:40:08.874922",
-    "region": "global"
-  },
-  {
-    "id": "d3",
-    "productId": "p3",
-    "discountPct": 20,
-    "endAt": "2025-09-21T17:40:08.874922",
-    "region": "usa"
+    "endsAt": "2024-04-12T21:00:00Z",
+    "location": { "lat": 24.774265, "lng": 46.738586, "geohash": "thrrhj" }
   }
 ]

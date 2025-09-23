@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../core/widgets/gradient_card.dart';
+import '../../core/widgets/app_button.dart';
 import 'settings_controller.dart';
 
 class SettingsView extends GetView<SettingsController> {
@@ -9,101 +9,77 @@ class SettingsView extends GetView<SettingsController> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        GradientCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'settings'.tr,
-                style: theme.textTheme.titleLarge,
+    return Scaffold(
+      appBar: AppBar(title: Text('settings'.tr)),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('settings_description'.tr, style: Get.textTheme.bodyLarge),
+            const SizedBox(height: 16),
+            Obx(
+              () => SwitchListTile(
+                value: controller.notificationsEnabled.value,
+                onChanged: controller.toggleNotifications,
+                title: Text('enable_notifications'.tr),
               ),
-              const SizedBox(height: 12),
-              Text(
-                'language'.tr,
-                style: theme.textTheme.titleMedium,
+            ),
+            ListTile(
+              leading: const Icon(Icons.location_on_outlined),
+              title: Text('enable_location'.tr),
+              subtitle: Text('map_description'.tr),
+              onTap: controller.requestLocation,
+            ),
+            Obx(
+              () => SwitchListTile(
+                value: controller.isDarkMode.value,
+                onChanged: controller.switchTheme,
+                title: Text('dark_mode'.tr),
               ),
-              const SizedBox(height: 8),
-              Obx(
-                () => Wrap(
-                  spacing: 12,
-                  children: [
-                    _LocaleChip(
-                      label: 'English',
-                      code: 'en',
-                      selected: controller.locale.value.languageCode == 'en',
-                      onSelected: controller.changeLocale,
-                    ),
-                    _LocaleChip(
-                      label: 'العربية',
-                      code: 'ar',
-                      selected: controller.locale.value.languageCode == 'ar',
-                      onSelected: controller.changeLocale,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Obx(
-                () => SwitchListTile.adaptive(
-                  value: controller.darkMode.value,
-                  title: Text('dark_mode'.tr),
-                  onChanged: controller.toggleDarkMode,
-                ),
-              ),
-            ],
-          ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.language),
+              title: Text('change_language'.tr),
+              onTap: () => _showLanguageDialog(context),
+            ),
+            const Spacer(),
+            AppButton(
+              label: 'logout'.tr,
+              onPressed: controller.logout,
+              expanded: true,
+              icon: Icons.logout,
+            ),
+          ],
         ),
-        const SizedBox(height: 20),
-        GradientCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'notifications'.tr,
-                style: theme.textTheme.titleMedium,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'instagram_hint'.tr,
-                style: theme.textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: controller.sendMockNotification,
-                icon: const Icon(Icons.notifications_active),
-                label: Text('send_mock_notification'.tr),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
-}
 
-class _LocaleChip extends StatelessWidget {
-  const _LocaleChip({
-    required this.label,
-    required this.code,
-    required this.selected,
-    required this.onSelected,
-  });
-
-  final String label;
-  final String code;
-  final bool selected;
-  final ValueChanged<String> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return ChoiceChip(
-      label: Text(label),
-      selected: selected,
-      onSelected: (_) => onSelected(code),
+  void _showLanguageDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        title: Text('language'.tr),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text('arabic'.tr),
+              onTap: () {
+                controller.changeLanguage(const Locale('ar'));
+                Get.back();
+              },
+            ),
+            ListTile(
+              title: Text('english'.tr),
+              onTap: () {
+                controller.changeLanguage(const Locale('en'));
+                Get.back();
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -1,72 +1,104 @@
-import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
-import '../theme/green_theme.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../theme/colors.dart';
 
 class PriceGauge extends StatelessWidget {
   const PriceGauge({
     super.key,
+    required this.value,
+    required this.min,
+    required this.max,
     required this.confidence,
-    this.label,
   });
 
+  final double value;
+  final double min;
+  final double max;
   final double confidence;
-  final String? label;
 
   @override
   Widget build(BuildContext context) {
-    final normalized = confidence.clamp(0.0, 1.0);
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label ?? 'Confidence',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              '${(normalized * 100).toStringAsFixed(0)}%',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: GreenPalette.primary,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Container(
-          height: 12,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            color: Colors.white.withOpacity(0.4),
+    final normalized = ((value - min) / (max - min)).clamp(0.0, 1.0);
+    final confidenceLabel = (confidence * 100).toStringAsFixed(0);
+    return SizedBox(
+      height: 180,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CustomPaint(
+            painter: _GaugePainter(value: normalized),
+            size: const Size(180, 180),
           ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  width: constraints.maxWidth * normalized,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(999),
-                    gradient: GreenTheme.primaryGradient,
-                    boxShadow: [
-                      BoxShadow(
-                        color: GreenPalette.primary.withOpacity(0.25),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'confidence_label'.trParams({'value': confidenceLabel}),
+                style: Get.textTheme.labelMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                value.toStringAsFixed(0),
+                style: Get.textTheme.displaySmall?.copyWith(
+                  color: AppColors.accent,
                 ),
-              );
-            },
+              ),
+              Text(
+                'price_range'.trParams({
+                  'min': min.toStringAsFixed(0),
+                  'max': max.toStringAsFixed(0),
+                }),
+                style: Get.textTheme.bodySmall,
+              ),
+            ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
+}
+
+class _GaugePainter extends CustomPainter {
+  _GaugePainter({required this.value});
+
+  final double value;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final startAngle = math.pi;
+    final sweepAngle = math.pi;
+    final backgroundPaint = Paint()
+      ..color = Colors.white.withOpacity(0.08)
+      ..strokeWidth = 18
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final progressPaint = Paint()
+      ..shader = LinearGradient(colors: AppColors.neonAccent).createShader(rect)
+      ..strokeWidth = 18
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawArc(
+      Rect.fromCircle(center: rect.center, radius: size.width / 2.2),
+      startAngle,
+      sweepAngle,
+      false,
+      backgroundPaint,
+    );
+    canvas.drawArc(
+      Rect.fromCircle(center: rect.center, radius: size.width / 2.2),
+      startAngle,
+      sweepAngle * value,
+      false,
+      progressPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _GaugePainter oldDelegate) => value != oldDelegate.value;
 }

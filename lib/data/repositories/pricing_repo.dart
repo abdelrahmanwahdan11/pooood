@@ -1,59 +1,56 @@
-import '../datasources/remote/stub_api_ds.dart';
-
-class PricingSample {
-  PricingSample({
-    required this.id,
-    required this.category,
-    required this.brand,
-    required this.model,
-    required this.condition,
-    required this.year,
-    required this.price,
-    required this.currency,
-    this.confidence = 0.7,
-    this.title,
-    this.image,
-  });
-
-  final String id;
-  final String category;
-  final String brand;
-  final String model;
-  final String condition;
-  final int year;
-  final double price;
-  final String currency;
-  final double confidence;
-  final String? title;
-  final String? image;
-
-  factory PricingSample.fromJson(Map<String, dynamic> json) {
-    return PricingSample(
-      id: json['id'] as String,
-      category: json['category'] as String,
-      brand: json['brand'] as String,
-      model: json['model'] as String,
-      condition: json['condition'] as String,
-      year: json['year'] as int,
-      price: (json['price'] as num).toDouble(),
-      currency: json['currency'] as String? ?? 'USD',
-      confidence: (json['confidence'] as num?)?.toDouble() ?? 0.7,
-      title: json['title'] as String?,
-      image: json['image'] as String?,
-    );
-  }
-}
+import '../datasources/local/mock_data_provider.dart';
+import '../models/price_request.dart';
+import '../models/price_result.dart';
 
 class PricingRepository {
-  PricingRepository(this._remote);
+  PricingRepository({required this.mockProvider});
 
-  final StubApiDataSource _remote;
-  List<PricingSample>? _cache;
+  final MockDataProvider mockProvider;
 
-  Future<List<PricingSample>> getSamples() async {
-    _cache ??= (await _remote.fetchPricingSamples())
-        .map((e) => PricingSample.fromJson(e))
-        .toList();
-    return _cache!;
+  Future<List<Map<String, dynamic>>> loadSamples() async {
+    final list = await mockProvider.loadList('assets/mock/pricing_samples.json');
+    return list.whereType<Map<String, dynamic>>().toList();
+  }
+
+  Future<PriceResult> heuristicEstimate(PriceRequest request) async {
+    final samples = await loadSamples();
+    final matching = samples.where((sample) {
+      return sample['category'] == request.category &&
+          sample['brand'] == request.brand;
+    }).toList();
+
+    if (matching.isEmpty) {
+      final base = samples.isNotEmpty ? samples.first['price'] as num : 1000;
+      final double estimate = base.toDouble() * 0.9;
+      return PriceResult(
+        estimate: estimate,
+        min: estimate * 0.85,
+        max: estimate * 1.1,
+        confidence: 0.4,
+        explanation: 'No similar records found, using heuristic baseline.',
+      );
+    }
+
+    matching.sort((a, b) =>
+        (a['price'] as num).compareTo(b['price'] as num));
+    final median = matching[matching.length ~/ 2]['price'] as num;
+    final ageFactor = (DateTime.now().year - request.year).clamp(0, 15);
+    final conditionMultiplier = switch (request.condition.toLowerCase()) {
+      'new' => 1.1,
+      'excellent' => 1.05,
+      'good' => 1.0,
+      'fair' => 0.9,
+      _ => 0.85,
+    };
+    final depreciation = 1 - (ageFactor * 0.03);
+    final estimate = median.toDouble() * conditionMultiplier * depreciation;
+    return PriceResult(
+      estimate: estimate,
+      min: estimate * 0.9,
+      max: estimate * 1.1,
+      confidence: 0.6,
+      explanation:
+          'Median adjusted by condition and age. Add more samples or deploy TFLite for higher accuracy.',
+    );
   }
 }

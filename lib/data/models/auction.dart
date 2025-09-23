@@ -1,77 +1,87 @@
-import 'product.dart';
+import 'package:collection/collection.dart';
+
+import 'bid.dart';
 
 class Auction {
-  Auction({
+  const Auction({
     required this.id,
     required this.productId,
-    required this.title,
-    required this.images,
     required this.currentBid,
     required this.minIncrement,
-    required this.biddersCount,
-    required this.endAt,
-    required this.description,
-    this.product,
+    required this.watchersCount,
+    required this.endsAt,
+    required this.status,
+    required this.createdAt,
+    this.biddersCount = 0,
+    this.bids = const [],
   });
 
   final String id;
   final String productId;
-  final String title;
-  final List<String> images;
   final double currentBid;
   final double minIncrement;
+  final int watchersCount;
   final int biddersCount;
-  final DateTime endAt;
-  final String description;
-  final Product? product;
+  final DateTime endsAt;
+  final String status;
+  final DateTime createdAt;
+  final List<Bid> bids;
 
-  bool get isActive => DateTime.now().isBefore(endAt);
+  bool get isActive => status == 'active' && DateTime.now().isBefore(endsAt);
+
+  Bid? get lastBid => bids.sortedBy<num>((bid) => bid.amount).lastOrNull;
 
   Auction copyWith({
     double? currentBid,
-    double? minIncrement,
+    int? watchersCount,
+    DateTime? endsAt,
+    String? status,
+    List<Bid>? bids,
     int? biddersCount,
-    DateTime? endAt,
-    Product? product,
-    String? description,
   }) {
     return Auction(
       id: id,
       productId: productId,
-      title: title,
-      images: images,
       currentBid: currentBid ?? this.currentBid,
-      minIncrement: minIncrement ?? this.minIncrement,
+      minIncrement: minIncrement,
+      watchersCount: watchersCount ?? this.watchersCount,
+      endsAt: endsAt ?? this.endsAt,
+      status: status ?? this.status,
+      createdAt: createdAt,
+      bids: bids ?? this.bids,
       biddersCount: biddersCount ?? this.biddersCount,
-      endAt: endAt ?? this.endAt,
-      description: description ?? this.description,
-      product: product ?? this.product,
-    );
-  }
-
-  factory Auction.fromJson(Map<String, dynamic> json) {
-    return Auction(
-      id: json['id'] as String,
-      productId: json['productId'] as String,
-      title: json['title'] as String,
-      images: (json['images'] as List<dynamic>).cast<String>(),
-      currentBid: (json['currentBid'] as num).toDouble(),
-      minIncrement: (json['minIncrement'] as num).toDouble(),
-      biddersCount: json['biddersCount'] as int,
-      endAt: DateTime.parse(json['endAt'] as String),
-      description: json['description'] as String,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
         'productId': productId,
-        'title': title,
-        'images': images,
         'currentBid': currentBid,
         'minIncrement': minIncrement,
+        'watchersCount': watchersCount,
         'biddersCount': biddersCount,
-        'endAt': endAt.toIso8601String(),
-        'description': description,
+        'endsAt': endsAt.toIso8601String(),
+        'status': status,
+        'createdAt': createdAt.toIso8601String(),
       };
+
+  factory Auction.fromJson(String id, Map<String, dynamic> json) {
+    return Auction(
+      id: id,
+      productId: json['productId'] as String? ?? '',
+      currentBid: (json['currentBid'] as num?)?.toDouble() ?? 0,
+      minIncrement: (json['minIncrement'] as num?)?.toDouble() ?? 10,
+      watchersCount: json['watchersCount'] as int? ?? 0,
+      biddersCount: json['biddersCount'] as int? ?? 0,
+      endsAt: json['endsAt'] != null
+          ? DateTime.tryParse(json['endsAt'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      status: json['status'] as String? ?? 'active',
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      bids: (json['bids'] as List<dynamic>? ?? [])
+          .map((e) => Bid.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 }

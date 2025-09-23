@@ -1,29 +1,41 @@
 class Validators {
-  Validators._();
+  const Validators._();
 
-  static String? requiredField(String? value, {String message = 'Required'}) {
-    if (value == null || value.trim().isEmpty) {
-      return message;
-    }
-    return null;
-  }
-
-  static String? minLength(String? value, int min,
-      {String message = 'Too short'}) {
-    if (value == null || value.trim().length < min) {
-      return message;
-    }
-    return null;
-  }
-
-  static String? year(String? value) {
+  static String? email(String? value) {
     if (value == null || value.isEmpty) {
-      return null;
+      return 'field_required';
     }
-    final year = int.tryParse(value);
-    final currentYear = DateTime.now().year;
-    if (year == null || year < 1980 || year > currentYear + 1) {
-      return 'Invalid year';
+    final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+    if (!regex.hasMatch(value)) {
+      return 'invalid_email';
+    }
+    return null;
+  }
+
+  static String? password(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'field_required';
+    }
+    if (value.length < 6) {
+      return 'password_short';
+    }
+    return null;
+  }
+
+  static String? notEmpty(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'field_required';
+    }
+    return null;
+  }
+
+  static String? positiveNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'field_required';
+    }
+    final parsed = double.tryParse(value.replaceAll(',', ''));
+    if (parsed == null || parsed <= 0) {
+      return 'invalid_number';
     }
     return null;
   }

@@ -1,23 +1,43 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/routing/app_routes.dart';
 import '../../data/datasources/local/get_storage_ds.dart';
 
 class OnboardingController extends GetxController {
-  OnboardingController(this._local);
+  OnboardingController(this._storage);
 
-  final GetStorageDataSource _local;
+  final GetStorageDataSource _storage;
+  final pageController = PageController();
+  final currentPage = 0.obs;
 
-  final RxInt currentPage = 0.obs;
-
-  void changePage(int index) {
+  void onPageChanged(int index) {
     currentPage.value = index;
   }
 
-  Future<void> completeOnboarding() async {
-    await _local.setOnboardingComplete(true);
-    Get.offAllNamed(AppRoutes.home);
+  void skip() {
+    _complete();
   }
 
-  void skip() => completeOnboarding();
+  void next() {
+    if (currentPage.value < 2) {
+      pageController.nextPage(
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeOutQuad,
+      );
+    } else {
+      _complete();
+    }
+  }
+
+  Future<void> _complete() async {
+    await _storage.write('onboarding_complete', true);
+    Get.offAllNamed(AppRoutes.login);
+  }
+
+  @override
+  void onClose() {
+    pageController.dispose();
+    super.onClose();
+  }
 }

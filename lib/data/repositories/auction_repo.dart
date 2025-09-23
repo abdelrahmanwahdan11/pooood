@@ -1,71 +1,93 @@
-import '../datasources/local/get_storage_ds.dart';
-import '../datasources/remote/stub_api_ds.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+
+import '../datasources/local/mock_data_provider.dart';
+import '../datasources/remote/firestore_ds.dart';
 import '../models/auction.dart';
 import '../models/bid.dart';
 
 class AuctionRepository {
-  AuctionRepository(this._remote, this._local);
+  AuctionRepository({
+    required this.firestore,
+    required this.mockProvider,
+  });
 
-  final StubApiDataSource _remote;
-  final GetStorageDataSource _local;
+  final FirestoreDataSource firestore;
+  final MockDataProvider mockProvider;
 
-  final Map<String, List<Bid>> _localBidBuffer = {};
-  List<Auction>? _mutableAuctions;
-
-  Future<List<Auction>> getAuctions() async {
-    _mutableAuctions ??=
-        (await _remote.fetchAuctions()).map((auction) => auction).toList();
-    return _mutableAuctions!;
+  Future<List<Auction>> fetchAuctions() async {
+    try {
+      final snapshot = await firestore.getCollection('auctions', (ref) {
+        return ref.orderBy('endsAt').limit(30);
+      });
+      return snapshot.docs
+          .map((doc) => Auction.fromJson(doc.id, doc.data()))
+          .toList();
+    } on FirebaseException {
+      return _loadMockAuctions();
+    } on PlatformException {
+      return _loadMockAuctions();
+    }
   }
 
-  Future<Auction?> getAuction(String id) async {
-    final auctions = await getAuctions();
+  Future<List<Auction>> _loadMockAuctions() async {
+    final list = await mockProvider.loadList('assets/mock/auctions.json');
+    return list
+        .whereType<Map<String, dynamic>>()
+        .map((e) => Auction.fromJson(e['id'] as String, e))
+        .toList();
+  }
+
+  Future<Auction?> fetchAuction(String id) async {
     try {
-      return auctions.firstWhere((element) => element.id == id);
-    } catch (_) {
+      final snapshot = await firestore.getDocument('auctions/$id');
+      if (!snapshot.exists) return null;
+      final data = snapshot.data();
+      if (data == null) return null;
+      return Auction.fromJson(snapshot.id, data);
+    } on FirebaseException {
+      final list = await _loadMockAuctions();
+      for (final auction in list) {
+        if (auction.id == id) {
+          return auction;
+        }
+      }
       return null;
     }
   }
 
-  Future<List<Bid>> getBids(String auctionId) async {
-    final remoteBids = await _remote.fetchBids(auctionId);
-    final localBids = _localBidBuffer[auctionId] ?? <Bid>[];
-    final allBids = [...localBids, ...remoteBids];
-    allBids.sort((a, b) => b.placedAt.compareTo(a.placedAt));
-    return allBids;
-  }
-
-  Future<Bid> placeBid({required String auctionId, required double amount}) async {
-    final auctions = await getAuctions();
-    final index = auctions.indexWhere((element) => element.id == auctionId);
-    if (index == -1) {
-      throw Exception('Auction not found');
+  Future<List<Bid>> fetchBids(String auctionId) async {
+    try {
+      final snapshot = await firestore.getCollection('auctions/$auctionId/bids', (ref) {
+        return ref.orderBy('placedAt', descending: true).limit(50);
+      });
+      return snapshot.docs.map((doc) => Bid.fromJson(doc.data())).toList();
+    } on FirebaseException {
+      final bids = await mockProvider.loadList('assets/mock/bids.json');
+      return bids
+          .whereType<Map<String, dynamic>>()
+          .where((element) => element['auctionId'] == auctionId)
+          .map(Bid.fromJson)
+          .toList();
     }
-    final auction = auctions[index];
-    final updated = auction.copyWith(
-      currentBid: amount,
-      biddersCount: auction.biddersCount + 1,
-    );
-    auctions[index] = updated;
-
-    final bid = Bid(
-      id: 'local-${DateTime.now().millisecondsSinceEpoch}',
-      auctionId: auctionId,
-      amount: amount,
-      userId: _local.readLocale() ?? 'guest',
-      placedAt: DateTime.now(),
-    );
-    _localBidBuffer.putIfAbsent(auctionId, () => <Bid>[]).insert(0, bid);
-    return bid;
   }
 
-  void clearLocalCache() {
-    _mutableAuctions = null;
-    _localBidBuffer.clear();
+  Stream<Auction?> watchAuction(String id) {
+    return firestore.streamDocument('auctions/$id').map((snapshot) {
+      if (!snapshot.exists) return null;
+      final data = snapshot.data();
+      if (data == null) return null;
+      return Auction.fromJson(snapshot.id, data);
+    });
   }
 
-  void warmUp() {
-    getAuctions();
-    _remote.fetchPricingSamples();
+  Future<void> placeBid({
+    required String auctionId,
+    required Bid bid,
+  }) async {
+    // TODO: Replace with callable Cloud Function to validate minIncrement and anti-sniping logic.
+    await firestore
+        .collection('auctions/$auctionId/bids')
+        .add(bid.toJson());
   }
 }

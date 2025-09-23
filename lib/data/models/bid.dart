@@ -1,33 +1,27 @@
 class Bid {
-  Bid({
-    required this.id,
-    required this.auctionId,
-    required this.amount,
+  const Bid({
     required this.userId,
+    required this.amount,
     required this.placedAt,
   });
 
-  final String id;
-  final String auctionId;
-  final double amount;
   final String userId;
+  final double amount;
   final DateTime placedAt;
+
+  Map<String, dynamic> toJson() => {
+        'userId': userId,
+        'amount': amount,
+        'placedAt': placedAt.toIso8601String(),
+      };
 
   factory Bid.fromJson(Map<String, dynamic> json) {
     return Bid(
-      id: json['id'] as String,
-      auctionId: json['auctionId'] as String,
-      amount: (json['amount'] as num).toDouble(),
-      userId: json['userId'] as String,
-      placedAt: DateTime.parse(json['placedAt'] as String),
+      userId: json['userId'] as String? ?? '',
+      amount: (json['amount'] as num?)?.toDouble() ?? 0,
+      placedAt: json['placedAt'] != null
+          ? DateTime.tryParse(json['placedAt'].toString()) ?? DateTime.now()
+          : DateTime.now(),
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'auctionId': auctionId,
-        'amount': amount,
-        'userId': userId,
-        'placedAt': placedAt.toIso8601String(),
-      };
 }

@@ -1,92 +1,82 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../core/theme/green_theme.dart';
+import '../../core/theme/colors.dart';
+import '../../core/theme/glass_widgets.dart';
 import '../../core/widgets/app_button.dart';
-import '../../core/widgets/gradient_scaffold.dart';
 import 'onboarding_controller.dart';
 
 class OnboardingView extends GetView<OnboardingController> {
   const OnboardingView({super.key});
 
-  List<_OnboardingSlide> _slides(BuildContext context) => [
-        _OnboardingSlide(
-          title: 'onboarding_title'.tr,
-          subtitle: 'onboarding_subtitle'.tr,
-          icon: Icons.gavel,
-        ),
-        _OnboardingSlide(
-          title: 'pricing'.tr,
-          subtitle: 'pricing_hint'.tr,
-          icon: Icons.price_change,
-        ),
-        _OnboardingSlide(
-          title: 'settings'.tr,
-          subtitle: 'notifications'.tr,
-          icon: Icons.auto_awesome,
-        ),
-      ];
-
   @override
   Widget build(BuildContext context) {
-    final slides = _slides(context);
-    final pageController = PageController();
-
-    return GradientScaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+    final pages = [
+      _OnboardingSlide(
+        image: 'https://images.unsplash.com/photo-1515169067865-5387ec356754',
+        title: 'onboarding_title_1'.tr,
+        description: 'onboarding_desc_1'.tr,
+      ),
+      _OnboardingSlide(
+        image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085',
+        title: 'onboarding_title_2'.tr,
+        description: 'onboarding_desc_2'.tr,
+      ),
+      _OnboardingSlide(
+        image: 'https://images.unsplash.com/photo-1494526585095-c41746248156',
+        title: 'onboarding_title_3'.tr,
+        description: 'onboarding_desc_3'.tr,
+      ),
+    ];
+    return GlassScaffold(
+      body: SafeArea(
         child: Column(
           children: [
             Align(
-              alignment: AlignmentDirectional.centerEnd,
+              alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: controller.skip,
-                child: Text(
-                  'skip'.tr,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge
-                      ?.copyWith(color: Colors.white),
-                ),
+                child: Text('skip'.tr, style: Get.textTheme.bodyMedium),
               ),
             ),
             Expanded(
               child: PageView.builder(
-                controller: pageController,
-                itemCount: slides.length,
-                onPageChanged: controller.changePage,
-                itemBuilder: (context, index) {
-                  final slide = slides[index];
-                  return _OnboardingContent(slide: slide);
-                },
+                controller: controller.pageController,
+                onPageChanged: controller.onPageChanged,
+                itemCount: pages.length,
+                itemBuilder: (_, index) => pages[index],
               ),
             ),
-            const SizedBox(height: 24),
             Obx(
               () => Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(slides.length, (index) {
-                  final isActive = controller.currentPage.value == index;
-                  return AnimatedContainer(
+                children: List.generate(
+                  pages.length,
+                  (index) => AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 6),
-                    width: isActive ? 20 : 10,
-                    height: 10,
+                    margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+                    height: 6,
+                    width: controller.currentPage.value == index ? 24 : 12,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(999),
-                      color: isActive
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.5),
+                      color: controller.currentPage.value == index
+                          ? AppColors.accent
+                          : Colors.white.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  );
-                }),
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 24),
-            AppButton(
-              label: 'get_started'.tr,
-              isExpanded: true,
-              onPressed: controller.completeOnboarding,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: AppButton(
+                label: controller.currentPage.value == pages.length - 1
+                    ? 'get_started'.tr
+                    : 'next'.tr,
+                onPressed: controller.next,
+                expanded: true,
+                icon: Icons.chevron_right,
+              ),
             ),
           ],
         ),
@@ -95,66 +85,46 @@ class OnboardingView extends GetView<OnboardingController> {
   }
 }
 
-class _OnboardingSlide {
-  _OnboardingSlide({
+class _OnboardingSlide extends StatelessWidget {
+  const _OnboardingSlide({
+    required this.image,
     required this.title,
-    required this.subtitle,
-    required this.icon,
+    required this.description,
   });
 
+  final String image;
   final String title;
-  final String subtitle;
-  final IconData icon;
-}
-
-class _OnboardingContent extends StatelessWidget {
-  const _OnboardingContent({required this.slide});
-
-  final _OnboardingSlide slide;
+  final String description;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: GreenTheme.primaryGradient,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      child: GradientGlassCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.network(
+                  image,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
               ),
-            ],
-          ),
-          child: Icon(
-            slide.icon,
-            size: 64,
-            color: Colors.white,
-          ),
+            ),
+            const SizedBox(height: 20),
+            Text(title, style: Get.textTheme.headlineMedium),
+            const SizedBox(height: 12),
+            Text(
+              description,
+              style: Get.textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
-        const SizedBox(height: 32),
-        Text(
-          slide.title,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          slide.subtitle,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: Colors.white.withOpacity(0.9),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
