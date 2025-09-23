@@ -1,44 +1,47 @@
 [
   {
-    "id": "auction-1",
-    "productId": "product-1",
-    "title": "Emerald Series Smartwatch 5",
-    "images": [
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
-      "https://images.unsplash.com/photo-1523475472560-d2df97ec485c"
-    ],
-    "currentBid": 320.0,
-    "minIncrement": 10.0,
+    "id": "auc_001",
+    "productId": "prod_001",
+    "currentBid": 185000,
+    "minIncrement": 2000,
+    "watchersCount": 42,
     "biddersCount": 12,
-    "endAt": "2025-07-20T21:30:00Z",
-    "description": "Limited edition smartwatch with AMOLED display, ECG tracking, and 7-day battery life."
+    "endsAt": "2024-04-12T18:30:00Z",
+    "status": "active",
+    "createdAt": "2024-04-09T10:00:00Z",
+    "bids": [
+      { "userId": "user_a", "amount": 182000, "placedAt": "2024-04-10T12:00:00Z" },
+      { "userId": "user_b", "amount": 184500, "placedAt": "2024-04-10T19:00:00Z" }
+    ]
   },
   {
-    "id": "auction-2",
-    "productId": "product-2",
-    "title": "Verdant Noise-Canceling Headphones",
-    "images": [
-      "https://images.unsplash.com/photo-1518444028785-8fbcd101ebb9",
-      "https://images.unsplash.com/photo-1517048676732-d65bc937f952"
-    ],
-    "currentBid": 185.0,
-    "minIncrement": 5.0,
-    "biddersCount": 8,
-    "endAt": "2025-07-18T17:00:00Z",
-    "description": "Over-ear wireless headphones with adaptive noise cancellation and 30-hour playback."
+    "id": "auc_002",
+    "productId": "prod_002",
+    "currentBid": 47000,
+    "minIncrement": 500,
+    "watchersCount": 28,
+    "biddersCount": 6,
+    "endsAt": "2024-04-11T20:00:00Z",
+    "status": "active",
+    "createdAt": "2024-04-08T16:30:00Z",
+    "bids": [
+      { "userId": "user_c", "amount": 45500, "placedAt": "2024-04-09T09:15:00Z" },
+      { "userId": "user_d", "amount": 46500, "placedAt": "2024-04-09T21:45:00Z" }
+    ]
   },
   {
-    "id": "auction-3",
-    "productId": "product-3",
-    "title": "Lime Studio Mirrorless Camera",
-    "images": [
-      "https://images.unsplash.com/photo-1519183071298-a2962be90b8e",
-      "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f"
-    ],
-    "currentBid": 950.0,
-    "minIncrement": 25.0,
-    "biddersCount": 5,
-    "endAt": "2025-07-25T10:15:00Z",
-    "description": "24MP APS-C mirrorless camera with dual SD slots, 4K recording, and weather sealing."
+    "id": "auc_003",
+    "productId": "prod_003",
+    "currentBid": 12000,
+    "minIncrement": 200,
+    "watchersCount": 55,
+    "biddersCount": 18,
+    "endsAt": "2024-04-13T15:45:00Z",
+    "status": "active",
+    "createdAt": "2024-04-08T10:45:00Z",
+    "bids": [
+      { "userId": "user_e", "amount": 11500, "placedAt": "2024-04-09T10:00:00Z" },
+      { "userId": "user_f", "amount": 11800, "placedAt": "2024-04-09T20:30:00Z" }
+    ]
   }
 ]

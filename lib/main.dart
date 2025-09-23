@@ -1,19 +1,4 @@
-/*
-README - Green Auction App (Flutter + GetX)
-=========================================
-1. Install Flutter 3.19+ and run `flutter pub get`.
-2. Run on devices:
-   - Android/iOS: `flutter run` (select device or emulator).
-   - Web (Instagram optimized): `flutter run -d chrome --web-renderer html`.
-3. Build release web:
-   - `flutter build web --web-renderer html --release`
-4. Build mobile release:
-   - `flutter build apk --release` / `flutter build ios --release`
-5. Mock data lives in assets/mock/*.json and assets/i18n for translations.
-6. All state management, routing, and localization is powered by GetX.
-7. Firebase / TensorFlow integrations are documented via TODO comments inside the relevant services and controllers.
-*/
-
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
@@ -22,38 +7,43 @@ import 'package:get_storage/get_storage.dart';
 import 'core/bindings/global_bindings.dart';
 import 'core/routing/app_pages.dart';
 import 'core/routing/app_routes.dart';
-import 'core/theme/green_theme.dart';
+import 'core/theme/app_theme.dart';
 import 'core/translations/app_translations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  await _maybeInitFirebase();
+  await AppTranslations.ensureInitialized();
+
   final storage = GetStorage();
   final storedLocale = storage.read<String>('locale');
-  final deviceLocale = Get.deviceLocale ?? const Locale('en');
-  final Locale initialLocale;
-  if (storedLocale != null) {
-    initialLocale = Locale(storedLocale);
-  } else {
-    initialLocale = deviceLocale.languageCode == 'ar'
-        ? const Locale('ar')
-        : const Locale('en');
-  }
-  final initialRoute = storage.read<bool>('onboarding_complete') == true
-      ? AppRoutes.home
-      : AppRoutes.onboarding;
+  final onboardingComplete = storage.read<bool>('onboarding_complete') ?? false;
+  final Locale initialLocale = storedLocale != null
+      ? Locale(storedLocale)
+      : (Get.deviceLocale?.languageCode == 'ar'
+          ? const Locale('ar')
+          : const Locale('en'));
+  final initialRoute = storedLocale == null
+      ? AppRoutes.language
+      : (onboardingComplete ? AppRoutes.home : AppRoutes.onboarding);
 
-  // BUILD WEB: flutter build web --web-renderer html --release
-  runApp(
-    GreenAuctionApp(
-      initialLocale: initialLocale,
-      initialRoute: initialRoute,
-    ),
-  );
+  runApp(GlassAuctionApp(
+    initialLocale: initialLocale,
+    initialRoute: initialRoute,
+  ));
 }
 
-class GreenAuctionApp extends StatelessWidget {
-  const GreenAuctionApp({
+Future<void> _maybeInitFirebase() async {
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('Firebase not initialised. Run flutterfire configure to connect. Error: $e');
+  }
+}
+
+class GlassAuctionApp extends StatelessWidget {
+  const GlassAuctionApp({
     super.key,
     required this.initialLocale,
     required this.initialRoute,
@@ -66,7 +56,7 @@ class GreenAuctionApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Green Auction',
+      title: 'app_name'.tr,
       translations: AppTranslations(),
       locale: initialLocale,
       fallbackLocale: const Locale('en'),
@@ -76,8 +66,8 @@ class GreenAuctionApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: GreenTheme.light,
-      darkTheme: GreenTheme.dark,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
       initialRoute: initialRoute,
       getPages: AppPages.routes,

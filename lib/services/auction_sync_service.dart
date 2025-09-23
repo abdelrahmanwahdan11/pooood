@@ -3,39 +3,31 @@ import 'dart:async';
 import 'package:get/get.dart';
 
 import '../data/models/auction.dart';
+import '../data/models/bid.dart';
 import '../data/repositories/auction_repo.dart';
 
 class AuctionSyncService extends GetxService {
-  AuctionSyncService(this._repo);
+  AuctionSyncService({required this.auctionRepository});
 
-  final AuctionRepository _repo;
-  final _controller = StreamController<List<Auction>>.broadcast();
+  final AuctionRepository auctionRepository;
+  final Map<String, StreamSubscription<Auction?>> _subscriptions = {};
 
-  Stream<List<Auction>> get stream => _controller.stream;
-
-  Future<AuctionSyncService> init() async {
-    final auctions = await _repo.getAuctions();
-    _controller.add(auctions);
-    return this;
+  void listenToAuction(String auctionId, void Function(Auction? auction) onData) {
+    _subscriptions[auctionId]?.cancel();
+    _subscriptions[auctionId] =
+        auctionRepository.watchAuction(auctionId).listen(onData);
   }
 
-  Future<void> refresh() async {
-    final auctions = await _repo.getAuctions();
-    _controller.add(auctions);
+  Future<void> placeBid(String auctionId, double amount, String userId) async {
+    final bid = Bid(userId: userId, amount: amount, placedAt: DateTime.now());
+    await auctionRepository.placeBid(auctionId: auctionId, bid: bid);
   }
 
   @override
   void onClose() {
-    _controller.close();
+    for (final sub in _subscriptions.values) {
+      sub.cancel();
+    }
     super.onClose();
   }
-
-  // TODO: Firebase Realtime/Firestore integration
-  // 1) Add firebase_core and cloud_firestore packages.
-  // 2) Initialize Firebase in main using generated firebase_options.dart.
-  // 3) Stream snapshots from `/auctions` collection and `/auctions/{id}/bids`.
-  // 4) Apply security rules to enforce bid increments and authenticated access.
-  // 5) Implement Cloud Function for anti-sniping extension (extend end time when
-  //    bids arrive in the final minute).
-  // 6) Map Firestore snapshots to Auction models and push through `_controller`.
 }

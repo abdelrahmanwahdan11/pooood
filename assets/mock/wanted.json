@@ -1,0 +1,20 @@
+[
+  {
+    "id": "want_001",
+    "userId": "user_request",
+    "title": "iPhone 15 Pro Max 256GB",
+    "targetPrice": 4300,
+    "radiusKm": 15,
+    "location": { "lat": 24.774265, "lng": 46.738586, "geohash": "thrrhj" },
+    "createdAt": "2024-04-07T11:00:00Z"
+  },
+  {
+    "id": "want_002",
+    "userId": "user_request",
+    "title": "Gaming PC RTX 4090",
+    "targetPrice": 12000,
+    "radiusKm": 50,
+    "location": { "lat": 25.204849, "lng": 55.270782, "geohash": "thqtw7" },
+    "createdAt": "2024-04-06T08:30:00Z"
+  }
+]

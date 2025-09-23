@@ -1,93 +1,70 @@
-import 'dart:math';
-
 import 'package:get/get.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
 
 import '../data/models/price_request.dart';
 import '../data/models/price_result.dart';
 import '../data/repositories/pricing_repo.dart';
 
 class PricingService extends GetxService {
-  PricingService(this._repo);
+  PricingService({required this.pricingRepository});
 
-  final PricingRepository _repo;
+  final PricingRepository pricingRepository;
+  Interpreter? _interpreter;
 
-  Future<PricingService> init() async {
-    await _repo.getSamples();
-    return this;
+  Future<void> loadModel() async {
+    try {
+      _interpreter = await Interpreter.fromAsset('tflite/model.tflite');
+      Get.log('TFLite model loaded');
+    } on Exception catch (e) {
+      Get.log('TFLite model not loaded: $e');
+    }
   }
 
   Future<PriceResult> estimatePrice(PriceRequest request) async {
-    final samples = await _repo.getSamples();
-    final filtered = samples
-        .where((sample) => sample.category == request.category)
-        .where((sample) => sample.brand == request.brand)
-        .toList();
-    final relevant = filtered.isNotEmpty ? filtered : samples;
+    if (_interpreter == null) {
+      await loadModel();
+    }
+    if (_interpreter == null) {
+      return pricingRepository.heuristicEstimate(request);
+    }
 
-    double weightSum = 0;
-    double priceSum = 0;
-    final nowYear = DateTime.now().year;
-    final comparableItems = <ComparableItem>[];
-
-    for (final sample in relevant) {
-      final conditionScore = _conditionScore(sample.condition, request.condition);
-      final yearDiff = (sample.year - request.year).abs();
-      final yearScore = max(0.2, 1 - (yearDiff * 0.1));
-      final agePenalty = max(0.4, 1 - ((nowYear - sample.year).abs() * 0.05));
-      final weight = conditionScore * yearScore * agePenalty;
-      weightSum += weight;
-      priceSum += sample.price * weight;
-
-      comparableItems.add(
-        ComparableItem(
-          id: sample.id,
-          title: sample.title ?? '${sample.brand} ${sample.model}',
-          price: sample.price,
-          image: sample.image,
-          source: sample.currency,
-        ),
+    try {
+      final input = _encode(request);
+      final output = List.generate(1, (_) => List.filled(3, 0.0));
+      _interpreter!.run(input, output);
+      final estimate = output[0][0];
+      final min = output[0][1];
+      final max = output[0][2];
+      return PriceResult(
+        estimate: estimate,
+        min: min,
+        max: max,
+        confidence: 0.8,
+        explanation:
+            'Estimated using TensorFlow Lite model. Ensure model metadata matches training pipeline.',
       );
+    } on Exception catch (e) {
+      Get.log('TFLite inference failed: $e');
+      return pricingRepository.heuristicEstimate(request);
     }
-
-    final average = weightSum == 0 ? 0 : priceSum / weightSum;
-    comparableItems.sort(
-      (a, b) => (a.price - average).abs().compareTo((b.price - average).abs()),
-    );
-
-    final sortedByPrice = List<ComparableItem>.from(comparableItems)
-      ..sort((a, b) => a.price.compareTo(b.price));
-    final min = sortedByPrice.isEmpty ? average : sortedByPrice.first.price * 0.95;
-    final max = sortedByPrice.isEmpty ? average : sortedByPrice.last.price * 1.05;
-    final confidence = weightSum == 0 ? 0.4 : (weightSum / relevant.length).clamp(0.3, 0.95);
-
-    // TODO: TensorFlow Lite integration steps
-    // 1) Train a regression model on historical pricing data.
-    // 2) Convert the trained model to TFLite using `tf.lite.TFLiteConverter`.
-    // 3) Add tflite_flutter to pubspec and place `model.tflite` under assets/tflite/.
-    // 4) Load interpreter in this service and feed encoded features for predictions.
-    // 5) Store preprocessing artifacts (scalers/encoders) and apply before inference.
-
-    return PriceResult(
-      estimate: average,
-      min: min,
-      max: max,
-      confidence: confidence,
-      currency: relevant.isNotEmpty ? relevant.first.currency : request.currency,
-      comparableItems: comparableItems.take(4).toList(),
-    );
   }
 
-  double _conditionScore(String sampleCondition, String requestCondition) {
-    if (sampleCondition.toLowerCase() == requestCondition.toLowerCase()) {
-      return 1;
-    }
-    const order = ['new', 'like_new', 'excellent', 'good', 'fair', 'poor'];
-    final sampleIndex = order.indexOf(sampleCondition.toLowerCase());
-    final requestIndex = order.indexOf(requestCondition.toLowerCase());
-    if (sampleIndex == -1 || requestIndex == -1) {
-      return 0.6;
-    }
-    final diff = (sampleIndex - requestIndex).abs();
-    return max(0.3, 1 - diff * 0.2);
+  List<List<double>> _encode(PriceRequest request) {
+    // TODO: Align encoding with training pipeline (one-hot/normalization). Currently simplified.
+    final year = request.year.toDouble();
+    final conditionScore = switch (request.condition.toLowerCase()) {
+      'new' => 1.0,
+      'excellent' => 0.9,
+      'good' => 0.8,
+      'fair' => 0.6,
+      _ => 0.5,
+    };
+    return [
+      [year, conditionScore, request.category.hashCode.toDouble().abs() % 1000]
+    ];
   }
+}
+
+extension on double {
+  double abs() => this < 0 ? -this : this;
 }

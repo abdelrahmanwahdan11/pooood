@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/green_theme.dart';
+import '../theme/colors.dart';
 
 class AppButton extends StatelessWidget {
   const AppButton({
@@ -8,49 +8,47 @@ class AppButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.icon,
-    this.isExpanded = false,
+    this.expanded = false,
+    this.isOutlined = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
-  final bool isExpanded;
+  final bool expanded;
+  final bool isOutlined;
 
   @override
   Widget build(BuildContext context) {
-    final button = ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: GreenPalette.primary,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        elevation: 0,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 20),
-            const SizedBox(width: 8),
-          ],
-          Text(
-            label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
+    Widget button;
+    if (isOutlined) {
+      button = OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: icon != null ? Icon(icon) : const SizedBox.shrink(),
+        label: Text(label),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.white,
+          side: const BorderSide(color: AppColors.accent),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
           ),
-        ],
-      ),
-    );
-
-    if (isExpanded) {
-      return SizedBox(width: double.infinity, child: button);
+        ),
+      );
+    } else {
+      button = ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: icon != null ? Icon(icon) : const SizedBox.shrink(),
+        label: Text(label),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.white,
+          disabledBackgroundColor: Colors.white24,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+        ),
+      );
     }
-    return button;
+    return expanded ? SizedBox(width: double.infinity, child: button) : button;
   }
 }

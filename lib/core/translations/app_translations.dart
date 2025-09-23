@@ -1,125 +1,23 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class AppTranslations extends Translations {
+  static final Map<String, Map<String, String>> _translations = {};
+  static bool _initialized = false;
+
+  static Future<void> ensureInitialized() async {
+    if (_initialized) return;
+    const locales = ['en', 'ar'];
+    for (final locale in locales) {
+      final data = await rootBundle.loadString('assets/i18n/$locale.json');
+      final Map<String, dynamic> map = json.decode(data) as Map<String, dynamic>;
+      _translations[locale] = map.map((key, value) => MapEntry(key, value.toString()));
+    }
+    _initialized = true;
+  }
+
   @override
-  Map<String, Map<String, String>> get keys => {
-        'en': {
-          'auctions': 'Auctions',
-          'pricing': 'Pricing',
-          'settings': 'Settings',
-          'onboarding_title': 'Discover smart auctions',
-          'onboarding_subtitle':
-              'Bid in real time and price products instantly with AI-ready workflows.',
-          'get_started': 'Get Started',
-          'skip': 'Skip',
-          'bid_now': 'Bid Now',
-          'current_bid': 'Current Bid',
-          'ends_in': 'Ends in',
-          'place_bid': 'Place Bid',
-          'bidders': 'Bidders',
-          'upcoming': 'Upcoming',
-          'active': 'Active',
-          'auction_badge': 'AUCTION',
-          'price_estimate': 'Price Estimate',
-          'price_range': 'Price Range',
-          'confidence': 'Confidence',
-          'category': 'Category',
-          'brand': 'Brand',
-          'model': 'Model',
-          'condition': 'Condition',
-          'year': 'Year',
-          'specs': 'Specifications',
-          'calculate': 'Calculate',
-          'currency': 'Currency',
-          'empty_state': 'No data available yet.',
-          'retry': 'Retry',
-          'language': 'Language',
-          'dark_mode': 'Dark Mode',
-          'notifications': 'Notifications',
-          'pricing_hint':
-              'Enter product details to receive a suggested price and confidence.',
-          'average_price': 'Average price from similar listings',
-          'similar_items': 'Comparable Listings',
-          'estimated_value': 'Estimated Value',
-          'min_increment': 'Min increment',
-          'your_bid': 'Your bid',
-          'increase': 'Increase',
-          'decrease': 'Decrease',
-          'submit_bid': 'Submit Bid',
-          'bid_submitted': 'Bid submitted (mock)',
-          'bid_placeholder': 'Enter bid amount',
-          'pricing_summary': 'Pricing Summary',
-          'confidence_high': 'High confidence',
-          'confidence_medium': 'Medium confidence',
-          'confidence_low': 'Low confidence',
-          'pricing_history': 'Recent valuations',
-          'pull_to_refresh': 'Pull to refresh',
-          'instagram_hint':
-              'Optimized for Instagram in-app browser with HTML renderer build.',
-          'send_mock_notification': 'Send mock notification',
-          'success': 'Success',
-          'warning': 'Warning',
-          'error': 'Error',
-          'required': 'Required field',
-        },
-        'ar': {
-          'auctions': 'المزادات',
-          'pricing': 'التسعير',
-          'settings': 'الإعدادات',
-          'onboarding_title': 'اكتشف المزادات الذكية',
-          'onboarding_subtitle':
-              'زايد مباشرة واحصل على تسعير فوري للمنتجات بتجربة جاهزة للذكاء الاصطناعي.',
-          'get_started': 'ابدأ الآن',
-          'skip': 'تخطي',
-          'bid_now': 'زايد الآن',
-          'current_bid': 'السعر الحالي',
-          'ends_in': 'ينتهي خلال',
-          'place_bid': 'تأكيد المزايدة',
-          'bidders': 'عدد المزايدين',
-          'upcoming': 'قريباً',
-          'active': 'نشط',
-          'auction_badge': 'مزاد',
-          'price_estimate': 'السعر التقديري',
-          'price_range': 'نطاق السعر',
-          'confidence': 'الثقة',
-          'category': 'الفئة',
-          'brand': 'الماركة',
-          'model': 'الطراز',
-          'condition': 'الحالة',
-          'year': 'السنة',
-          'specs': 'المواصفات',
-          'calculate': 'احسب',
-          'currency': 'العملة',
-          'empty_state': 'لا توجد بيانات حالياً.',
-          'retry': 'إعادة المحاولة',
-          'language': 'اللغة',
-          'dark_mode': 'الوضع الداكن',
-          'notifications': 'الإشعارات',
-          'pricing_hint':
-              'أدخل تفاصيل المنتج للحصول على سعر تقديري ومستوى الثقة.',
-          'average_price': 'متوسط السعر لعروض مشابهة',
-          'similar_items': 'عناصر مشابهة',
-          'estimated_value': 'القيمة المتوقعة',
-          'min_increment': 'الزيادة الدنيا',
-          'your_bid': 'عرضك',
-          'increase': 'زيادة',
-          'decrease': 'نقص',
-          'submit_bid': 'إرسال العرض',
-          'bid_submitted': 'تم تسجيل المزايدة (بيانات تجريبية)',
-          'bid_placeholder': 'أدخل قيمة المزايدة',
-          'pricing_summary': 'ملخص التسعير',
-          'confidence_high': 'ثقة عالية',
-          'confidence_medium': 'ثقة متوسطة',
-          'confidence_low': 'ثقة منخفضة',
-          'pricing_history': 'تقييمات حديثة',
-          'pull_to_refresh': 'اسحب للتحديث',
-          'instagram_hint':
-              'مصمم ليعمل بسلاسة داخل متصفح إنستغرام مع html renderer.',
-          'send_mock_notification': 'إرسال إشعار تجريبي',
-          'success': 'نجاح',
-          'warning': 'تحذير',
-          'error': 'خطأ',
-          'required': 'حقل مطلوب',
-        },
-      };
+  Map<String, Map<String, String>> get keys => _translations;
 }

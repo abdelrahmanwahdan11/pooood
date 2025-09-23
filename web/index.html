@@ -2,30 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="description"
-      content="Green Gradient auction and pricing experience optimized for Instagram in-app browser."
-    />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <meta name="theme-color" content="#1FAA59" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>Green Auction House</title>
-    <!-- WEB RENDERER: build using `flutter build web --web-renderer html --release` for Instagram webview -->
-    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#012FFF" />
+    <meta
+      name="description"
+      content="Glass Liquid Auctions - realtime auctions, deals, wanted requests, and AI-powered pricing insights."
+    />
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/Icon-192.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/Icon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/Icon-192.png" />
+    <!-- Optional: Enable when manifest/service worker are configured for PWA support -->
+    <!-- <link rel="manifest" href="manifest.json" /> -->
+    <title>Glass Liquid Auctions</title>
   </head>
   <body>
     <script>
-      window.addEventListener('load', function () {
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('flutter_service_worker.js');
-        }
-      });
+      window.flutterConfiguration = {
+        renderer: 'html',
+      };
     </script>
     <script src="flutter.js" defer></script>
+    <script>
+      window.addEventListener('load', function () {
+        _flutter.loader.loadEntrypoint({}).then(function (engineInitializer) {
+          engineInitializer.initializeEngine().then(function (appRunner) {
+            appRunner.runApp();
+          });
+        });
+      });
+    </script>
+    <!-- BUILD RELEASE: flutter build web --web-renderer html --release -->
   </body>
 </html>

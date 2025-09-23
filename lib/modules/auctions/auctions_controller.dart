@@ -1,110 +1,112 @@
-import 'dart:async';
-
 import 'package:get/get.dart';
+import 'package:geolocator/geolocator.dart';
 
-import '../../core/utils/currency_utils.dart';
+import '../../core/routing/app_routes.dart';
+import '../../core/utils/debounce.dart';
+import '../../core/utils/distance.dart';
 import '../../data/models/auction.dart';
-import '../../data/models/bid.dart';
+import '../../data/models/product.dart';
 import '../../data/repositories/auction_repo.dart';
-import '../../services/auction_sync_service.dart';
-import '../../services/notification_service.dart';
+import '../../data/repositories/product_repo.dart';
+import '../../services/location_service.dart';
 
 class AuctionsController extends GetxController {
   AuctionsController(
-    this._repo,
-    this._syncService,
-    this._notifications,
+    this._auctionRepository,
+    this._productRepository,
+    this._locationService,
   );
 
-  final AuctionRepository _repo;
-  final AuctionSyncService _syncService;
-  final NotificationService _notifications;
+  final AuctionRepository _auctionRepository;
+  final ProductRepository _productRepository;
+  final LocationService _locationService;
+  final _debouncer = Debouncer();
 
-  final RxList<Auction> auctions = <Auction>[].obs;
-  final RxBool isLoading = false.obs;
-  final RxnString error = RxnString();
-  final Map<String, RxList<Bid>> _bids = {};
-  final RxInt visibleCount = 5.obs;
-
-  late final Stream<DateTime> ticker =
-      Stream<DateTime>.periodic(const Duration(seconds: 1), (_) => DateTime.now())
-          .asBroadcastStream();
-  StreamSubscription<List<Auction>>? _syncSubscription;
-
-  // TODO: Firebase Realtime/Firestore live bidding
-  // 1) Listen to Firestore snapshots for auctions and bids.
-  // 2) Authenticate users with firebase_auth and secure access rules.
-  // 3) Enforce bid increments via Firestore security rules.
-  // 4) Trigger Cloud Functions for anti-sniping extensions and analytics.
-  // 5) Sync local state with remote changes and surface push notifications.
-  // TODO: FCM notification when a watched auction is outbid.
+  final auctions = <Auction>[].obs;
+  final filteredAuctions = <Auction>[].obs;
+  final products = <String, Product>{}.obs;
+  final isLoading = true.obs;
+  final searchQuery = ''.obs;
+  Position? userPosition;
 
   @override
   void onInit() {
     super.onInit();
     fetchAuctions();
-    _syncSubscription = _syncService.stream.listen((value) {
-      auctions.assignAll(value);
-    });
+    _initLocation();
   }
 
-  @override
-  void onClose() {
-    _syncSubscription?.cancel();
-    super.onClose();
+  Future<void> _initLocation() async {
+    userPosition = await _locationService.determinePosition();
+    _sortByDistance();
   }
 
   Future<void> fetchAuctions() async {
+    isLoading.value = true;
     try {
-      isLoading.value = true;
-      final data = await _repo.getAuctions();
+      final data = await _auctionRepository.fetchAuctions();
       auctions.assignAll(data);
-      error.value = null;
-    } catch (e) {
-      error.value = e.toString();
+      for (final auction in data) {
+        final product = await _productRepository.fetchProduct(auction.productId);
+        if (product != null) {
+          products[product.id] = product;
+        }
+      }
+      filteredAuctions.assignAll(auctions);
+      _sortByDistance();
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<void> refreshAuctions() async {
-    await fetchAuctions();
-    await _syncService.refresh();
+  void search(String value) {
+    searchQuery.value = value;
+    _debouncer(() {
+      final query = value.trim().toLowerCase();
+      if (query.isEmpty) {
+        filteredAuctions.assignAll(auctions);
+      } else {
+        filteredAuctions.assignAll(
+          auctions.where((auction) {
+            final product = products[auction.productId];
+            final haystack = '${product?.title ?? ''} ${product?.brand ?? ''}'.toLowerCase();
+            return haystack.contains(query);
+          }),
+        );
+      }
+      _sortByDistance();
+    });
   }
 
-  List<Auction> get visibleAuctions {
-    final int count = visibleCount.value.clamp(0, auctions.length).toInt();
-    return auctions.take(count).toList();
+  void openAuction(Auction auction) {
+    Get.toNamed('${AppRoutes.auctionDetail}/${auction.id}', arguments: auction.id);
   }
 
-  void loadMore() {
-    if (visibleCount.value < auctions.length) {
-      visibleCount.value += 3;
-    }
-  }
+  Product? productFor(Auction auction) => products[auction.productId];
 
-  RxList<Bid> bidsFor(String auctionId) {
-    return _bids.putIfAbsent(auctionId, () => <Bid>[].obs);
-  }
-
-  Future<void> loadBids(String auctionId) async {
-    final results = await _repo.getBids(auctionId);
-    bidsFor(auctionId).assignAll(results);
-  }
-
-  Future<Auction?> getAuctionById(String id) async {
-    return _repo.getAuction(id);
-  }
-
-  Future<void> placeBid({required String auctionId, required double amount}) async {
-    await _repo.placeBid(auctionId: auctionId, amount: amount);
-    await loadBids(auctionId);
-    final updated = await _repo.getAuctions();
-    auctions.assignAll(updated);
-    await _notifications.showLocalMockNotification(
-      title: 'bid_now'.tr,
-      body: '${CurrencyUtils.format(amount)} • ${'bid_submitted'.tr}',
-    );
-    await _syncService.refresh();
+  void _sortByDistance() {
+    final position = userPosition;
+    if (position == null) return;
+    filteredAuctions.sort((a, b) {
+      final productA = products[a.productId];
+      final productB = products[b.productId];
+      final distanceA = productA != null
+          ? DistanceUtils.haversineDistance(
+              startLat: position.latitude,
+              startLng: position.longitude,
+              endLat: productA.location.latitude,
+              endLng: productA.location.longitude,
+            )
+          : double.infinity;
+      final distanceB = productB != null
+          ? DistanceUtils.haversineDistance(
+              startLat: position.latitude,
+              startLng: position.longitude,
+              endLat: productB.location.latitude,
+              endLng: productB.location.longitude,
+            )
+          : double.infinity;
+      return distanceA.compareTo(distanceB);
+    });
   }
 }

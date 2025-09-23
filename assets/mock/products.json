@@ -1,38 +1,48 @@
 [
   {
-    "id": "product-1",
-    "title": "Emerald Series Smartwatch 5",
-    "brand": "GreenPulse",
-    "category": "Wearables",
+    "id": "prod_001",
+    "title": "Tesla Model 3 Performance",
+    "brand": "Tesla",
+    "category": "Cars",
+    "description": "Dual motor, autopilot, white interior with full self driving preview.",
     "images": [
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30"
+      "https://images.unsplash.com/photo-1517949908114-720226b05a4a",
+      "https://images.unsplash.com/photo-1511390424026-dc66c7d49e24"
     ],
-    "basePrice": 299.0,
-    "condition": "excellent",
-    "year": 2024
+    "videoUrl": "https://samplelib.com/lib/preview/mp4/sample-5s.mp4",
+    "ownerId": "user_demo",
+    "basePrice": 180000,
+    "location": { "lat": 24.7136, "lng": 46.6753, "geohash": "thrr6v" },
+    "createdAt": "2024-04-10T10:00:00Z"
   },
   {
-    "id": "product-2",
-    "title": "Verdant Noise-Canceling Headphones",
-    "brand": "AuraSound",
-    "category": "Audio",
+    "id": "prod_002",
+    "title": "Rolex Submariner 2021",
+    "brand": "Rolex",
+    "category": "Luxury",
+    "description": "Excellent condition, full set with box and papers.",
     "images": [
-      "https://images.unsplash.com/photo-1518444028785-8fbcd101ebb9"
+      "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3",
+      "https://images.unsplash.com/photo-1518544889280-5f9c5c207ac4"
     ],
-    "basePrice": 179.0,
-    "condition": "good",
-    "year": 2023
+    "ownerId": "user_demo",
+    "basePrice": 45000,
+    "location": { "lat": 25.3548, "lng": 51.1839, "geohash": "tjs7nq" },
+    "createdAt": "2024-04-09T08:45:00Z"
   },
   {
-    "id": "product-3",
-    "title": "Lime Studio Mirrorless Camera",
-    "brand": "LeafShot",
-    "category": "Cameras",
+    "id": "prod_003",
+    "title": "MacBook Pro 16"",
+    "brand": "Apple",
+    "category": "Electronics",
+    "description": "M3 Max, 64GB RAM, 1TB SSD, space black, used for design work only.",
     "images": [
-      "https://images.unsplash.com/photo-1519183071298-a2962be90b8e"
+      "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d",
+      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"
     ],
-    "basePrice": 899.0,
-    "condition": "excellent",
-    "year": 2022
+    "ownerId": "user_demo",
+    "basePrice": 11000,
+    "location": { "lat": 25.2048, "lng": 55.2708, "geohash": "thqtw7" },
+    "createdAt": "2024-04-08T14:15:00Z"
   }
 ]

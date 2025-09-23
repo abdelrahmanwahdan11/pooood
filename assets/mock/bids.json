@@ -1,30 +1,8 @@
 [
-  {
-    "id": "bid-1001",
-    "auctionId": "auction-1",
-    "amount": 310.0,
-    "userId": "user-greenfox",
-    "placedAt": "2025-07-18T18:30:00Z"
-  },
-  {
-    "id": "bid-1002",
-    "auctionId": "auction-1",
-    "amount": 320.0,
-    "userId": "user-mintwave",
-    "placedAt": "2025-07-18T19:10:00Z"
-  },
-  {
-    "id": "bid-1003",
-    "auctionId": "auction-2",
-    "amount": 180.0,
-    "userId": "user-aurora",
-    "placedAt": "2025-07-17T15:05:00Z"
-  },
-  {
-    "id": "bid-1004",
-    "auctionId": "auction-3",
-    "amount": 930.0,
-    "userId": "user-lensleaf",
-    "placedAt": "2025-07-16T09:15:00Z"
-  }
+  { "auctionId": "auc_001", "userId": "user_a", "amount": 182000, "placedAt": "2024-04-10T12:00:00Z" },
+  { "auctionId": "auc_001", "userId": "user_b", "amount": 184500, "placedAt": "2024-04-10T19:00:00Z" },
+  { "auctionId": "auc_002", "userId": "user_c", "amount": 45500, "placedAt": "2024-04-09T09:15:00Z" },
+  { "auctionId": "auc_002", "userId": "user_d", "amount": 46500, "placedAt": "2024-04-09T21:45:00Z" },
+  { "auctionId": "auc_003", "userId": "user_e", "amount": 11500, "placedAt": "2024-04-09T10:00:00Z" },
+  { "auctionId": "auc_003", "userId": "user_f", "amount": 11800, "placedAt": "2024-04-09T20:30:00Z" }
 ]

@@ -1,46 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../core/routing/app_routes.dart';
+import '../../core/translations/app_translations.dart';
 import '../../data/datasources/local/get_storage_ds.dart';
+import '../../services/auth_service.dart';
+import '../../services/location_service.dart';
 import '../../services/notification_service.dart';
 
 class SettingsController extends GetxController {
-  SettingsController(this._local, this._notifications);
+  SettingsController(
+    this._notificationService,
+    this._locationService,
+    this._authService,
+    this._storage,
+  );
 
-  final GetStorageDataSource _local;
-  final NotificationService _notifications;
+  final NotificationService _notificationService;
+  final LocationService _locationService;
+  final AuthService _authService;
+  final GetStorageDataSource _storage;
 
-  late final Rx<Locale> locale;
-  late final RxBool darkMode;
+  final notificationsEnabled = false.obs;
+  final isDarkMode = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    locale = (Get.locale ?? const Locale('en')).obs;
-    final stored = _local.readLocale();
-    if (stored != null) {
-      locale.value = Locale(stored);
+    isDarkMode.value = Get.isDarkMode;
+    notificationsEnabled.value =
+        _storage.read<bool>('notifications_enabled') ?? false;
+  }
+
+  Future<void> toggleNotifications(bool value) async {
+    notificationsEnabled.value = value;
+    await _storage.write('notifications_enabled', value);
+    if (value) {
+      await _notificationService.init();
     }
-    darkMode = _local.isDarkMode.obs;
   }
 
-  Future<void> changeLocale(String code) async {
-    final newLocale = Locale(code);
-    locale.value = newLocale;
-    await _local.writeLocale(code);
-    Get.updateLocale(newLocale);
+  Future<void> requestLocation() async {
+    await _locationService.determinePosition();
   }
 
-  Future<void> toggleDarkMode(bool value) async {
-    darkMode.value = value;
-    await _local.setDarkMode(value);
-    Get.changeThemeMode(value ? ThemeMode.dark : ThemeMode.light);
+  void switchTheme(bool dark) {
+    isDarkMode.value = dark;
+    Get.changeThemeMode(dark ? ThemeMode.dark : ThemeMode.light);
   }
 
-  Future<void> sendMockNotification() async {
-    await _notifications.showLocalMockNotification(
-      title: 'Green Auction',
-      body: 'Your watched item is heating up!',
-    );
+  Future<void> changeLanguage(Locale locale) async {
+    await AppTranslations.ensureInitialized();
+    Get.updateLocale(locale);
+    await _storage.write('locale', locale.languageCode);
+  }
+
+  Future<void> logout() async {
+    await _authService.signOut();
+    Get.offAllNamed(AppRoutes.login);
   }
 }
