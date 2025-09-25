@@ -1,62 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../core/routing/app_routes.dart';
-import '../../core/translations/app_translations.dart';
-import '../../data/datasources/local/get_storage_ds.dart';
-import '../../services/auth_service.dart';
-import '../../services/location_service.dart';
-import '../../services/notification_service.dart';
+import '../../data/models/app_settings.dart';
+import '../../data/repositories/settings_repository.dart';
 
 class SettingsController extends GetxController {
-  SettingsController(
-    this._notificationService,
-    this._locationService,
-    this._authService,
-    this._storage,
-  );
+  SettingsRepository get _repository => Get.find<SettingsRepository>();
 
-  final NotificationService _notificationService;
-  final LocationService _locationService;
-  final AuthService _authService;
-  final GetStorageDataSource _storage;
-
-  final notificationsEnabled = false.obs;
-  final isDarkMode = false.obs;
+  late final Rx<AppSettings> settings;
 
   @override
   void onInit() {
     super.onInit();
-    isDarkMode.value = Get.isDarkMode;
-    notificationsEnabled.value =
-        _storage.read<bool>('notifications_enabled') ?? false;
+    settings = _repository.load().obs;
   }
 
-  Future<void> toggleNotifications(bool value) async {
-    notificationsEnabled.value = value;
-    await _storage.write('notifications_enabled', value);
-    if (value) {
-      await _notificationService.init();
-    }
+  void updateLocale(String code) {
+    settings.value = settings.value.copyWith(localeCode: code);
+    Get.updateLocale(Locale(code));
   }
 
-  Future<void> requestLocation() async {
-    await _locationService.determinePosition();
+  void updateDistance(double value) {
+    settings.value = settings.value.copyWith(distanceFilterKm: value);
   }
 
-  void switchTheme(bool dark) {
-    isDarkMode.value = dark;
-    Get.changeThemeMode(dark ? ThemeMode.dark : ThemeMode.light);
+  void toggleNotifications(bool enabled) {
+    settings.value = settings.value.copyWith(notificationsEnabled: enabled);
   }
 
-  Future<void> changeLanguage(Locale locale) async {
-    await AppTranslations.ensureInitialized();
-    Get.updateLocale(locale);
-    await _storage.write('locale', locale.languageCode);
+  void toggleDarkMode(bool enabled) {
+    settings.value = settings.value
+        .copyWith(themeMode: enabled ? ThemeMode.dark : ThemeMode.light);
   }
 
-  Future<void> logout() async {
-    await _authService.signOut();
-    Get.offAllNamed(AppRoutes.login);
+  void save() {
+    _repository.save(settings.value);
   }
 }
