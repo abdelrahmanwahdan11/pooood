@@ -1,7 +1,5 @@
-name: glass_auction_app
-description: >-
-  Full-featured multilingual auction and pricing experience using Flutter, GetX,
-  Firebase, TensorFlow Lite, and Gemini with a glass liquid theme.
+name: bidglass
+description: Liquid glass marketplace for auctions, nearby discounts, and AI pricing insights.
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -15,30 +13,10 @@ dependencies:
     sdk: flutter
   get: ^4.6.6
   get_storage: ^2.1.1
-  google_fonts: ^6.2.1
-  intl: ^0.19.0
-  cached_network_image: ^3.3.1
-  transparent_image: ^2.0.1
-  shimmer: ^3.0.0
-  http: ^1.2.1
-  url_launcher: ^6.2.5
-  geolocator: ^11.0.0
-  geocoding: ^2.1.1
   google_maps_flutter: ^2.5.0
-  firebase_core: ^2.25.4
-  firebase_auth: ^4.17.4
-  cloud_firestore: ^4.15.5
-  firebase_storage: ^11.6.6
-  firebase_messaging: ^14.7.10
-  cloud_functions: ^4.6.8
-  tflite_flutter: ^0.10.0
-  tflite_flutter_helper: ^0.4.3
-  google_generative_ai: ^0.4.2
-  file_picker: ^6.1.1
-  video_player: ^2.8.2
-  flutter_cache_manager: ^3.3.1
-  collection: ^1.18.0
-  uuid: ^4.3.3
+  geolocator: ^11.0.0
+  home_widget: ^0.3.0
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -47,8 +25,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/i18n/
-    - assets/mock/
-    - assets/images/
-    - assets/tflite/

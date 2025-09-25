@@ -1,78 +1,55 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-import 'core/bindings/global_bindings.dart';
+import 'core/bindings/initial_binding.dart';
+import 'core/localization/translations.dart';
 import 'core/routing/app_pages.dart';
 import 'core/routing/app_routes.dart';
 import 'core/theme/app_theme.dart';
-import 'core/translations/app_translations.dart';
+import 'data/repositories/app_repository_binding.dart';
+import 'services/widget_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  await _maybeInitFirebase();
-  await AppTranslations.ensureInitialized();
+  await WidgetService.initialize();
 
   final storage = GetStorage();
   final storedLocale = storage.read<String>('locale');
-  final onboardingComplete = storage.read<bool>('onboarding_complete') ?? false;
-  final Locale initialLocale = storedLocale != null
-      ? Locale(storedLocale)
-      : (Get.deviceLocale?.languageCode == 'ar'
-          ? const Locale('ar')
-          : const Locale('en'));
-  final initialRoute = storedLocale == null
-      ? AppRoutes.language
-      : (onboardingComplete ? AppRoutes.home : AppRoutes.onboarding);
+  final locale = storedLocale != null ? Locale(storedLocale) : const Locale('ar');
+  final themeModeIndex = storage.read<int>('theme_mode') ?? ThemeMode.light.index;
+  final normalizedIndex = themeModeIndex
+      .clamp(0, ThemeMode.values.length - 1)
+      .toInt();
+  final themeMode = ThemeMode.values[normalizedIndex];
 
-  runApp(GlassAuctionApp(
-    initialLocale: initialLocale,
-    initialRoute: initialRoute,
-  ));
+  runApp(BidGlassApp(initialLocale: locale, initialThemeMode: themeMode));
 }
 
-Future<void> _maybeInitFirebase() async {
-  try {
-    await Firebase.initializeApp();
-  } catch (e) {
-    debugPrint('Firebase not initialised. Run flutterfire configure to connect. Error: $e');
-  }
-}
-
-class GlassAuctionApp extends StatelessWidget {
-  const GlassAuctionApp({
-    super.key,
-    required this.initialLocale,
-    required this.initialRoute,
-  });
+class BidGlassApp extends StatelessWidget {
+  const BidGlassApp({super.key, required this.initialLocale, required this.initialThemeMode});
 
   final Locale initialLocale;
-  final String initialRoute;
+  final ThemeMode initialThemeMode;
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      title: 'app_title'.tr,
       debugShowCheckedModeBanner: false,
-      title: 'app_name'.tr,
       translations: AppTranslations(),
       locale: initialLocale,
       fallbackLocale: const Locale('en'),
-      supportedLocales: const [Locale('en'), Locale('ar')],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
-      initialRoute: initialRoute,
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: initialThemeMode,
+      initialRoute: AppRoutes.shell,
       getPages: AppPages.routes,
-      initialBinding: GlobalBindings(),
+      initialBinding: InitialBinding(),
       defaultTransition: Transition.cupertino,
+      smartManagement: SmartManagement.full,
     );
   }
 }
