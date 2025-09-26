@@ -1,28 +1,25 @@
 import 'package:flutter/material.dart';
 
-enum ScreenSize { compact, medium, expanded }
-
 class Responsive {
-  const Responsive._();
+  static bool isCompact(BuildContext context) =>
+      MediaQuery.of(context).size.width < 360;
 
-  static ScreenSize sizeOf(BoxConstraints constraints) {
-    final width = constraints.maxWidth;
-    if (width < 360) {
-      return ScreenSize.compact;
-    } else if (width < 600) {
-      return ScreenSize.medium;
-    }
-    return ScreenSize.expanded;
+  static bool isMedium(BuildContext context) =>
+      MediaQuery.of(context).size.width >= 360 &&
+      MediaQuery.of(context).size.width < 600;
+
+  static bool isExpanded(BuildContext context) =>
+      MediaQuery.of(context).size.width >= 600;
+
+  static double adaptivePadding(BuildContext context) {
+    if (isExpanded(context)) return 32;
+    if (isMedium(context)) return 24;
+    return 16;
   }
 
-  static double horizontalPadding(ScreenSize size) {
-    switch (size) {
-      case ScreenSize.compact:
-        return 12;
-      case ScreenSize.medium:
-        return 16;
-      case ScreenSize.expanded:
-        return 24;
-    }
+  static double adaptiveTextScale(BuildContext context) {
+    if (isExpanded(context)) return 1.05;
+    if (isCompact(context)) return 0.95;
+    return 1.0;
   }
 }

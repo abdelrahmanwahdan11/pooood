@@ -1,11 +1,30 @@
 import 'package:get/get.dart';
 
-import '../../services/notifications_service.dart';
+import '../../data/models/notification_item.dart';
+import '../../data/repositories/notifications_repo.dart';
 
 class NotificationsController extends GetxController {
-  NotificationsService get service => Get.find<NotificationsService>();
+  NotificationsController(this.repository);
 
-  void markAsRead(String id) {
-    service.markAsRead(id);
+  final NotificationsRepository repository;
+
+  final notifications = <NotificationItem>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    load();
+  }
+
+  Future<void> load() async {
+    final data = await repository.fetchNotifications();
+    notifications.assignAll(data);
+  }
+
+  int get unreadCount => notifications.where((n) => !n.read).length;
+
+  Future<void> markRead(NotificationItem item, bool read) async {
+    await repository.markRead(item.id, read);
+    await load();
   }
 }
