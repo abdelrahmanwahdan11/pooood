@@ -1,71 +1,63 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/routing/app_routes.dart';
-import '../../data/models/user.dart';
-import '../../data/repositories/user_repository.dart';
-import '../../services/notifications_service.dart';
+import '../../data/repositories/settings_repo.dart';
 
 class ShellController extends GetxController {
-  final currentIndex = 0.obs;
+  ShellController(this.settingsRepository);
+
+  final SettingsRepository settingsRepository;
+
+  final pageIndex = 0.obs;
   final searchQuery = ''.obs;
-
-  late final User user;
-
-  NotificationsService get notificationsService => Get.find<NotificationsService>();
+  final PageController pageController = PageController();
+  final TextEditingController searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
-  void onInit() {
-    super.onInit();
-    user = Get.find<UserRepository>().currentUser;
+  void onClose() {
+    pageController.dispose();
+    searchController.dispose();
+    _debounce?.cancel();
+    super.onClose();
   }
 
-  void changeTab(int index) {
-    currentIndex.value = index;
-  }
-
-  void updateSearch(String value) {
-    searchQuery.value = value;
-  }
-
-  void openFilters() {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('filters'.tr, style: Get.textTheme.titleLarge),
-            const SizedBox(height: 12),
-            Text('search_filters_hint'.tr),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: Get.back,
-                child: Text('apply_filters'.tr),
-              ),
-            )
-          ],
-        ),
-      ),
+  void onTabSelected(int index) {
+    pageIndex.value = index;
+    pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
     );
+  }
+
+  void onPageChanged(int index) {
+    pageIndex.value = index;
+  }
+
+  void onSearchChanged(String query) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 280), () {
+      searchQuery.value = query.trim();
+    });
   }
 
   void openNotifications() {
     Get.toNamed(AppRoutes.notifications);
   }
 
-  void openAddItem() {
+  void openAddFlow() {
     Get.toNamed(AppRoutes.addItem);
   }
 
-  void openMyActivity(String tab) {
-    Get.toNamed(AppRoutes.myActivity, arguments: tab);
+  void openMyActivity() {
+    Get.toNamed(AppRoutes.myActivity);
+  }
+
+  void openSettingsDrawer(GlobalKey<ScaffoldState> scaffoldKey) {
+    scaffoldKey.currentState?.openEndDrawer();
   }
 }
