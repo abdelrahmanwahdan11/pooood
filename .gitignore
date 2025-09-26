@@ -16,3 +16,4 @@ macos/
 windows/
 **/Generated.xcconfig
 **/Flutter.podspec
+firebase/functions/node_modules/

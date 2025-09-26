@@ -1,3 +1,12 @@
+/**
+ * BidGlass Firebase Cloud Functions template.
+ *
+ * The concrete Firebase implementation is intentionally commented out so the
+ * Flutter application can run in a preview-only mode before the backend is
+ * connected. Uncomment and adjust the code once Firebase services are ready.
+ */
+
+/*
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
@@ -85,3 +94,6 @@ export const scheduledCleanup = functions.pubsub
     snapshot.docs.forEach((doc) => batch.update(doc.ref, { status: 'ended' }));
     await batch.commit();
   });
+*/
+
+export {};

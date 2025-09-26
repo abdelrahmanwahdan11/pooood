@@ -1,87 +1,84 @@
-import 'package:collection/collection.dart';
+import 'package:intl/intl.dart';
 
-import 'bid.dart';
+import 'geo_point.dart';
+import 'product.dart';
 
 class Auction {
-  const Auction({
+  Auction({
     required this.id,
-    required this.productId,
+    required this.product,
     required this.currentBid,
-    required this.minIncrement,
-    required this.watchersCount,
-    required this.endsAt,
-    required this.status,
-    required this.createdAt,
-    this.biddersCount = 0,
-    this.bids = const [],
+    required this.startPrice,
+    required this.endTime,
+    required this.location,
+    required this.participants,
   });
 
   final String id;
-  final String productId;
+  final Product product;
   final double currentBid;
-  final double minIncrement;
-  final int watchersCount;
-  final int biddersCount;
-  final DateTime endsAt;
-  final String status;
-  final DateTime createdAt;
-  final List<Bid> bids;
+  final double startPrice;
+  final DateTime endTime;
+  final GeoPoint location;
+  final int participants;
 
-  bool get isActive => status == 'active' && DateTime.now().isBefore(endsAt);
+  factory Auction.fromMap(Map<String, dynamic> map, {String? id}) {
+    DateTime parseDate(dynamic value) {
+      if (value is DateTime) return value;
+      if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+      if (value is num) {
+        final intValue = value.toInt();
+        return DateTime.fromMillisecondsSinceEpoch(intValue);
+      }
+      return DateTime.now();
+    }
 
-  Bid? get lastBid => bids.sortedBy<num>((bid) => bid.amount).lastOrNull;
+    GeoPoint parseLocation(dynamic value) {
+      if (value is GeoPoint) return value;
+      if (value is Map<String, dynamic>) {
+        return GeoPoint.fromMap(value);
+      }
+      return const GeoPoint(latitude: 0, longitude: 0);
+    }
 
-  Auction copyWith({
-    double? currentBid,
-    int? watchersCount,
-    DateTime? endsAt,
-    String? status,
-    List<Bid>? bids,
-    int? biddersCount,
-  }) {
     return Auction(
-      id: id,
-      productId: productId,
-      currentBid: currentBid ?? this.currentBid,
-      minIncrement: minIncrement,
-      watchersCount: watchersCount ?? this.watchersCount,
-      endsAt: endsAt ?? this.endsAt,
-      status: status ?? this.status,
-      createdAt: createdAt,
-      bids: bids ?? this.bids,
-      biddersCount: biddersCount ?? this.biddersCount,
+      id: id ?? map['id'] as String? ?? '',
+      product: Product.fromMap(
+        (map['product'] as Map<String, dynamic>? ?? const <String, dynamic>{}),
+      ),
+      currentBid: (map['currentBid'] as num?)?.toDouble() ?? 0,
+      startPrice: (map['startPrice'] as num?)?.toDouble() ?? 0,
+      endTime: parseDate(map['endTime']),
+      location: parseLocation(map['location']),
+      participants: (map['participants'] as num?)?.toInt() ?? 0,
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'productId': productId,
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'product': product.toMap(),
         'currentBid': currentBid,
-        'minIncrement': minIncrement,
-        'watchersCount': watchersCount,
-        'biddersCount': biddersCount,
-        'endsAt': endsAt.toIso8601String(),
-        'status': status,
-        'createdAt': createdAt.toIso8601String(),
+        'startPrice': startPrice,
+        'endTime': endTime.toIso8601String(),
+        'location': location.toMap(),
+        'participants': participants,
       };
 
-  factory Auction.fromJson(String id, Map<String, dynamic> json) {
+  String get formattedCurrentBid => NumberFormat.currency(symbol: '﷼').format(currentBid);
+  Duration get timeLeft => endTime.difference(DateTime.now());
+
+  Auction copyWith({
+    double? currentBid,
+    int? participants,
+  }) {
     return Auction(
       id: id,
-      productId: json['productId'] as String? ?? '',
-      currentBid: (json['currentBid'] as num?)?.toDouble() ?? 0,
-      minIncrement: (json['minIncrement'] as num?)?.toDouble() ?? 10,
-      watchersCount: json['watchersCount'] as int? ?? 0,
-      biddersCount: json['biddersCount'] as int? ?? 0,
-      endsAt: json['endsAt'] != null
-          ? DateTime.tryParse(json['endsAt'].toString()) ?? DateTime.now()
-          : DateTime.now(),
-      status: json['status'] as String? ?? 'active',
-      createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
-          : DateTime.now(),
-      bids: (json['bids'] as List<dynamic>? ?? [])
-          .map((e) => Bid.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      product: product,
+      currentBid: currentBid ?? this.currentBid,
+      startPrice: startPrice,
+      endTime: endTime,
+      location: location,
+      participants: participants ?? this.participants,
     );
   }
 }

@@ -1,59 +1,47 @@
-class UserModel {
-  const UserModel({
+import 'geo_point.dart';
+
+class User {
+  const User({
     required this.id,
-    required this.displayName,
-    this.photoUrl,
-    this.phone,
-    this.locale,
-    this.favorites = const [],
-    this.createdAt,
+    required this.name,
+    required this.avatarUrl,
+    this.location,
   });
 
   final String id;
-  final String displayName;
-  final String? photoUrl;
-  final String? phone;
-  final String? locale;
-  final List<String> favorites;
-  final DateTime? createdAt;
+  final String name;
+  final String avatarUrl;
+  final GeoPoint? location;
 
-  UserModel copyWith({
-    String? displayName,
-    String? photoUrl,
-    List<String>? favorites,
-    String? locale,
-  }) {
-    return UserModel(
-      id: id,
-      displayName: displayName ?? this.displayName,
-      photoUrl: photoUrl ?? this.photoUrl,
-      phone: phone,
-      locale: locale ?? this.locale,
-      favorites: favorites ?? this.favorites,
-      createdAt: createdAt,
+  factory User.fromMap(Map<String, dynamic> map, {String? id}) {
+    GeoPoint? parseLocation(dynamic value) {
+      if (value is GeoPoint) return value;
+      if (value is Map<String, dynamic>) {
+        return GeoPoint.fromMap(value);
+      }
+      return null;
+    }
+
+    return User(
+      id: id ?? map['id'] as String? ?? '',
+      name: map['name'] as String? ?? '',
+      avatarUrl: map['avatarUrl'] as String? ?? '',
+      location: parseLocation(map['location']),
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'displayName': displayName,
-        'photoUrl': photoUrl,
-        'phone': phone,
-        'locale': locale,
-        'favs': favorites,
-        'createdAt': createdAt?.toIso8601String(),
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'name': name,
+        'avatarUrl': avatarUrl,
+        if (location != null) 'location': location!.toMap(),
       };
 
-  factory UserModel.fromJson(String id, Map<String, dynamic> json) {
-    return UserModel(
-      id: id,
-      displayName: json['displayName'] as String? ?? 'Guest',
-      photoUrl: json['photoUrl'] as String?,
-      phone: json['phone'] as String?,
-      locale: json['locale'] as String?,
-      favorites: (json['favs'] as List<dynamic>? ?? []).cast<String>(),
-      createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt'].toString())
-          : null,
-    );
-  }
+  static const demo = User(
+    id: 'user_1',
+    name: 'ليان الزهراني',
+    avatarUrl:
+        'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress',
+    location: GeoPoint(latitude: 24.7136, longitude: 46.6753),
+  );
 }
