@@ -1,5 +1,5 @@
-name: bidglass
-description: Liquid glass marketplace for auctions, nearby discounts, and AI pricing insights.
+name: liquid_bid
+description: LiquidBid marketplace for auctions, discounts, price watch, and AI pricing.
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -12,11 +12,10 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   get: ^4.6.6
-  get_storage: ^2.1.1
-  google_maps_flutter: ^2.5.0
-  geolocator: ^11.0.0
-  home_widget: ^0.3.0
-  intl: ^0.19.0
+  shared_preferences: ^2.2.2
+  sqflite: ^2.3.2
+  flutter_animate: ^4.5.0
+  cupertino_icons: ^1.0.6
 
 dev_dependencies:
   flutter_test:

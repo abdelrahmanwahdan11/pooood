@@ -1,55 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 
-import 'core/bindings/initial_binding.dart';
 import 'core/localization/translations.dart';
 import 'core/routing/app_pages.dart';
 import 'core/routing/app_routes.dart';
 import 'core/theme/app_theme.dart';
-import 'data/repositories/app_repository_binding.dart';
-import 'services/widget_service.dart';
+import 'data/db/app_db.dart';
+import 'data/repositories/settings_repo.dart';
+import 'modules/shell/shell_binding.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init();
-  await WidgetService.initialize();
+  final database = await AppDatabase.instance.init();
+  final settingsRepository = SettingsRepository(database: database);
+  await settingsRepository.loadPreferences();
 
-  final storage = GetStorage();
-  final storedLocale = storage.read<String>('locale');
-  final locale = storedLocale != null ? Locale(storedLocale) : const Locale('ar');
-  final themeModeIndex = storage.read<int>('theme_mode') ?? ThemeMode.light.index;
-  final normalizedIndex = themeModeIndex
-      .clamp(0, ThemeMode.values.length - 1)
-      .toInt();
-  final themeMode = ThemeMode.values[normalizedIndex];
-
-  runApp(BidGlassApp(initialLocale: locale, initialThemeMode: themeMode));
+  runApp(LiquidBidApp(
+    settingsRepository: settingsRepository,
+  ));
 }
 
-class BidGlassApp extends StatelessWidget {
-  const BidGlassApp({super.key, required this.initialLocale, required this.initialThemeMode});
+class LiquidBidApp extends StatelessWidget {
+  const LiquidBidApp({super.key, required this.settingsRepository});
 
-  final Locale initialLocale;
-  final ThemeMode initialThemeMode;
+  final SettingsRepository settingsRepository;
 
   @override
   Widget build(BuildContext context) {
+    final locale = settingsRepository.currentLocale;
     return GetMaterialApp(
-      title: 'app_title'.tr,
-      debugShowCheckedModeBanner: false,
-      translations: AppTranslations(),
-      locale: initialLocale,
+      title: 'LiquidBid',
+      translations: LiquidBidTranslations(),
+      locale: locale,
       fallbackLocale: const Locale('en'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: initialThemeMode,
+      initialBinding: ShellBinding(settingsRepository: settingsRepository),
       initialRoute: AppRoutes.shell,
       getPages: AppPages.routes,
-      initialBinding: InitialBinding(),
-      defaultTransition: Transition.cupertino,
-      smartManagement: SmartManagement.full,
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.buildThemeData(settingsRepository),
+      defaultTransition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 240),
+      smartManagement: SmartManagement.onlyBuilder,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('ar'), Locale('en')],
     );
   }
 }

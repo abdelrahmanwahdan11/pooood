@@ -1,6 +1,6 @@
 class AppRoutes {
-  static const String shell = '/';
-  static const String notifications = '/notifications';
-  static const String myActivity = '/my-activity';
-  static const String addItem = '/add-item';
+  static const shell = '/';
+  static const notifications = '/notifications';
+  static const addItem = '/add-item';
+  static const myActivity = '/my-activity';
 }

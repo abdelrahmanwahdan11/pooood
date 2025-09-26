@@ -14,23 +14,26 @@ class AppPages {
   static final routes = <GetPage<dynamic>>[
     GetPage(
       name: AppRoutes.shell,
-      page: () => const ShellView(),
+      page: ShellView.new,
       binding: ShellBinding(),
     ),
     GetPage(
       name: AppRoutes.notifications,
-      page: () => const NotificationsView(),
+      page: NotificationsView.new,
       binding: NotificationsBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.myActivity,
-      page: () => const MyActivityView(),
-      binding: MyActivityBinding(),
+      transition: Transition.fadeIn,
     ),
     GetPage(
       name: AppRoutes.addItem,
-      page: () => const AddItemView(),
+      page: AddItemView.new,
       binding: AddItemBinding(),
+      transition: Transition.downToUp,
+    ),
+    GetPage(
+      name: AppRoutes.myActivity,
+      page: MyActivityView.new,
+      binding: MyActivityBinding(),
+      transition: Transition.fadeIn,
     ),
   ];
 }

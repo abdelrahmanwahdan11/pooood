@@ -1,40 +1,41 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../data/models/price_watch.dart';
-import '../../data/repositories/price_watch_repository.dart';
+import '../../data/repositories/watches_repo.dart';
 
 class PriceWatchController extends GetxController {
-  final _items = <PriceWatch>[].obs;
+  PriceWatchController(this.repository);
 
-  PriceWatchRepository get _repository => Get.find<PriceWatchRepository>();
+  final WatchesRepository repository;
 
-  List<PriceWatch> get watches => _items;
-
-  final formKey = GlobalKey<FormState>();
-  final productController = TextEditingController();
-  final priceController = TextEditingController();
-  final notesController = TextEditingController();
+  final watches = <PriceWatch>[].obs;
+  final isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    _items.assignAll(_repository.getWatches());
+    loadWatches();
   }
 
-  void addWatch() {
-    if (!formKey.currentState!.validate()) return;
-    final watch = PriceWatch(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      productName: productController.text.trim(),
-      targetPrice: double.parse(priceController.text.trim()),
-      notes: notesController.text.trim(),
-      isActive: true,
-    );
-    _repository.addWatch(watch);
-    _items.assignAll(_repository.getWatches());
-    productController.clear();
-    priceController.clear();
-    notesController.clear();
+  Future<void> loadWatches() async {
+    isLoading.value = true;
+    final list = await repository.fetchWatches();
+    watches.assignAll(list);
+    isLoading.value = false;
+  }
+
+  Future<void> addWatch(PriceWatch watch) async {
+    await repository.addWatch(watch);
+    await loadWatches();
+  }
+
+  Future<void> updateWatch(PriceWatch watch) async {
+    await repository.updateWatch(watch);
+    await loadWatches();
+  }
+
+  Future<void> deleteWatch(int id) async {
+    await repository.deleteWatch(id);
+    await loadWatches();
   }
 }
