@@ -1,6 +1,6 @@
 class AppRoutes {
+  static const onboarding = '/onboarding';
+  static const auth = '/auth';
   static const shell = '/';
-  static const notifications = '/notifications';
-  static const addItem = '/add-item';
-  static const myActivity = '/my-activity';
+  static const watchDetails = '/watch-details';
 }

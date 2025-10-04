@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../core/routing/app_routes.dart';
 import '../../data/repositories/settings_repo.dart';
 
 class ShellController extends GetxController {
@@ -12,16 +9,12 @@ class ShellController extends GetxController {
   final SettingsRepository settingsRepository;
 
   final pageIndex = 0.obs;
-  final searchQuery = ''.obs;
   final PageController pageController = PageController();
-  final TextEditingController searchController = TextEditingController();
-  Timer? _debounce;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void onClose() {
     pageController.dispose();
-    searchController.dispose();
-    _debounce?.cancel();
     super.onClose();
   }
 
@@ -29,7 +22,7 @@ class ShellController extends GetxController {
     pageIndex.value = index;
     pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 320),
       curve: Curves.easeOutCubic,
     );
   }
@@ -38,26 +31,10 @@ class ShellController extends GetxController {
     pageIndex.value = index;
   }
 
-  void onSearchChanged(String query) {
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 280), () {
-      searchQuery.value = query.trim();
-    });
-  }
-
-  void openNotifications() {
-    Get.toNamed(AppRoutes.notifications);
-  }
-
-  void openAddFlow() {
-    Get.toNamed(AppRoutes.addItem);
-  }
-
-  void openMyActivity() {
-    Get.toNamed(AppRoutes.myActivity);
-  }
-
-  void openSettingsDrawer(GlobalKey<ScaffoldState> scaffoldKey) {
-    scaffoldKey.currentState?.openEndDrawer();
+  Future<void> toggleLocale() async {
+    final current = settingsRepository.currentLocale.languageCode;
+    final locale = current == 'ar' ? const Locale('en') : const Locale('ar');
+    await settingsRepository.updateLocale(locale);
+    Get.updateLocale(locale);
   }
 }

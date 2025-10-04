@@ -1,41 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../data/repositories/settings_repo.dart';
 
 class AppTheme {
-  static const Color background = Color(0xFFF0EFF2);
-  static const Color onSurface = Color(0xFF222222);
-  static const Color accentPrimary = Color(0xFFFBD545);
-  static const Color accentSuccess = Color(0xFF7BD597);
+  static const Color background = Color(0xFF7CF2D3);
+  static const Color onSurface = Color(0xFF081C24);
+  static const Color accentPrimary = Color(0xFF141A37);
+  static const Color accentSuccess = Color(0xFFFF6584);
 
   static ThemeData buildThemeData(SettingsRepository settingsRepository) {
     final density = settingsRepository.themeDensity;
     final base = ThemeData(
       useMaterial3: true,
-      fontFamily: 'SF Pro Display',
+      textTheme: _buildTextTheme(),
+      fontFamily: GoogleFonts.readexPro().fontFamily,
       colorScheme: ColorScheme(
         brightness: Brightness.light,
         primary: accentPrimary,
-        onPrimary: onSurface,
-        secondary: accentSuccess,
+        onPrimary: const Color(0xFFFAF9FB),
+        secondary: const Color(0xFF00D9A6),
         onSecondary: onSurface,
-        surface: Colors.white.withOpacity(0.9),
+        surface: const Color(0xFFF9FFFE),
         onSurface: onSurface,
         background: background,
         onBackground: onSurface,
-        error: Colors.red.shade400,
+        error: const Color(0xFFFF4D67),
         onError: Colors.white,
-        tertiary: Colors.white,
+        tertiary: const Color(0xFFEEF7FF),
         onTertiary: onSurface,
-        surfaceVariant: Colors.white.withOpacity(0.8),
-        outline: Colors.black.withOpacity(0.08),
-        shadow: Colors.black.withOpacity(0.18),
+        surfaceVariant: const Color(0xFFE8FFF7),
+        outline: const Color(0x33081C24),
+        shadow: const Color(0x29081C24),
       ),
       scaffoldBackgroundColor: background,
       visualDensity: density == ThemeDensity.compact
           ? VisualDensity.compact
           : VisualDensity.standard,
-      textTheme: _buildTextTheme(),
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
@@ -44,14 +45,14 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white.withOpacity(0.18),
+        fillColor: Colors.white.withOpacity(0.45),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.32)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.12)),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.22)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
@@ -64,14 +65,14 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-        backgroundColor: Colors.white.withOpacity(0.24),
-        selectedColor: accentPrimary.withOpacity(0.32),
+        labelStyle: GoogleFonts.readexPro(fontWeight: FontWeight.w600),
+        backgroundColor: Colors.white.withOpacity(0.4),
+        selectedColor: const Color(0xFF141A37).withOpacity(0.15),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: Colors.white.withOpacity(0.2),
+        backgroundColor: Colors.white.withOpacity(0.35),
         elevation: 0,
-        indicatorColor: accentPrimary.withOpacity(0.24),
+        indicatorColor: const Color(0xFF141A37).withOpacity(0.24),
         iconTheme: MaterialStateProperty.resolveWith(
           (states) => IconThemeData(
             color: states.contains(MaterialState.selected)
@@ -83,7 +84,7 @@ class AppTheme {
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.black.withOpacity(0.85),
-        contentTextStyle: const TextStyle(color: Colors.white),
+        contentTextStyle: GoogleFonts.readexPro(color: Colors.white),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
@@ -101,26 +102,78 @@ class AppTheme {
   }
 
   static TextTheme _buildTextTheme() {
-    const baseStyle = TextStyle(
-      color: onSurface,
-      letterSpacing: 0.1,
-      fontWeight: FontWeight.w500,
-    );
-    return const TextTheme().copyWith(
-      displayLarge: baseStyle.copyWith(fontSize: 42, fontWeight: FontWeight.w700),
-      displayMedium: baseStyle.copyWith(fontSize: 34, fontWeight: FontWeight.w600),
-      displaySmall: baseStyle.copyWith(fontSize: 30, fontWeight: FontWeight.w600),
-      headlineMedium: baseStyle.copyWith(fontSize: 26, fontWeight: FontWeight.w600),
-      headlineSmall: baseStyle.copyWith(fontSize: 22, fontWeight: FontWeight.w600),
-      titleLarge: baseStyle.copyWith(fontSize: 20, fontWeight: FontWeight.w600),
-      titleMedium: baseStyle.copyWith(fontSize: 18, fontWeight: FontWeight.w500),
-      titleSmall: baseStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w500),
-      bodyLarge: baseStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w400),
-      bodyMedium: baseStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w400),
-      bodySmall: baseStyle.copyWith(fontSize: 13, fontWeight: FontWeight.w300),
-      labelLarge: baseStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w600),
-      labelMedium: baseStyle.copyWith(fontSize: 12, fontWeight: FontWeight.w500),
-      labelSmall: baseStyle.copyWith(fontSize: 11, fontWeight: FontWeight.w500),
+    final base = GoogleFonts.readexProTextTheme();
+    return base.copyWith(
+      displayLarge: base.displayLarge?.copyWith(
+        fontSize: 44,
+        fontWeight: FontWeight.w700,
+        color: onSurface,
+      ),
+      displayMedium: base.displayMedium?.copyWith(
+        fontSize: 36,
+        fontWeight: FontWeight.w600,
+        color: onSurface,
+      ),
+      displaySmall: base.displaySmall?.copyWith(
+        fontSize: 30,
+        fontWeight: FontWeight.w600,
+        color: onSurface,
+      ),
+      headlineMedium: base.headlineMedium?.copyWith(
+        fontSize: 26,
+        fontWeight: FontWeight.w600,
+        color: onSurface,
+      ),
+      headlineSmall: base.headlineSmall?.copyWith(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        color: onSurface,
+      ),
+      titleLarge: base.titleLarge?.copyWith(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: onSurface,
+      ),
+      titleMedium: base.titleMedium?.copyWith(
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+        color: onSurface,
+      ),
+      titleSmall: base.titleSmall?.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: onSurface,
+      ),
+      bodyLarge: base.bodyLarge?.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: onSurface,
+      ),
+      bodyMedium: base.bodyMedium?.copyWith(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: onSurface,
+      ),
+      bodySmall: base.bodySmall?.copyWith(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        color: onSurface.withOpacity(0.8),
+      ),
+      labelLarge: base.labelLarge?.copyWith(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: onSurface,
+      ),
+      labelMedium: base.labelMedium?.copyWith(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        color: onSurface,
+      ),
+      labelSmall: base.labelSmall?.copyWith(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: onSurface,
+      ),
     );
   }
 }
