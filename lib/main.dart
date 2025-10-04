@@ -8,7 +8,7 @@ import 'core/routing/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'data/db/app_db.dart';
 import 'data/repositories/settings_repo.dart';
-import 'modules/shell/shell_binding.dart';
+import 'data/repositories/watch_store_repo.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,13 +29,25 @@ class LiquidBidApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locale = settingsRepository.currentLocale;
+    final initialRoute = settingsRepository.hasCompletedOnboarding
+        ? (settingsRepository.authToken != null || settingsRepository.isGuestMode
+            ? AppRoutes.shell
+            : AppRoutes.auth)
+        : AppRoutes.onboarding;
     return GetMaterialApp(
       title: 'LiquidBid',
       translations: LiquidBidTranslations(),
       locale: locale,
       fallbackLocale: const Locale('en'),
-      initialBinding: ShellBinding(settingsRepository: settingsRepository),
-      initialRoute: AppRoutes.shell,
+      initialBinding: BindingsBuilder(() {
+        if (!Get.isRegistered<SettingsRepository>()) {
+          Get.put<SettingsRepository>(settingsRepository, permanent: true);
+        }
+        if (!Get.isRegistered<WatchStoreRepository>()) {
+          Get.put(WatchStoreRepository(settingsRepository), permanent: true);
+        }
+      }),
+      initialRoute: initialRoute,
       getPages: AppPages.routes,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.buildThemeData(settingsRepository),

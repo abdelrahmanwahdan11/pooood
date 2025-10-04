@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../core/utils/responsive.dart';
-import '../../core/widgets/app_badge.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/widgets/glass_container.dart';
-import '../ai_pricing/pricing_view.dart';
-import '../auction_home/auction_view.dart';
-import '../discounts_nearby/discounts_view.dart';
-import '../explore/explore_view.dart';
-import '../notifications/notifications_controller.dart';
-import '../price_watch/price_watch_view.dart';
-import '../settings/settings_controller.dart';
-import '../settings/settings_view.dart';
+import '../favorites/favorites_view.dart';
+import '../home/home_view.dart';
+import '../profile/profile_view.dart';
 import 'shell_controller.dart';
 
 class ShellView extends GetView<ShellController> {
@@ -19,159 +13,75 @@ class ShellView extends GetView<ShellController> {
 
   @override
   Widget build(BuildContext context) {
-    final padding = Responsive.adaptivePadding(context);
-    final scaffoldKey = GlobalKey<ScaffoldState>();
+    final theme = Theme.of(context);
+    final settings = controller.settingsRepository;
     return Scaffold(
-      key: scaffoldKey,
-      endDrawer: const SettingsDrawer(),
-      body: Obx(
-        () => NestedScrollView(
-          physics: const BouncingScrollPhysics(),
-          headerSliverBuilder: (context, innerScrolled) => [
-            SliverAppBar(
-              floating: true,
-              snap: true,
-              stretch: true,
-              expandedHeight: 140,
-              backgroundColor: Colors.white.withOpacity(0.2),
-              title: Text(_pageTitle(controller.pageIndex.value).tr),
-              flexibleSpace: FlexibleSpaceBar(
-                background: SafeArea(
-                  bottom: false,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      left: padding,
-                      right: padding,
-                      top: 12,
-                    ),
-                    child: Column(
+      key: controller.scaffoldKey,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+              child: GlassContainer(
+                borderRadius: 28,
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                child: Row(
+                  children: [
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () => controller.openSettingsDrawer(scaffoldKey),
-                              child: CircleAvatar(
-                                radius: 24,
-                                backgroundImage: NetworkImage(_avatarUrl()),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: GlassContainer(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                child: TextField(
-                                  controller: controller.searchController,
-                                  onChanged: controller.onSearchChanged,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    icon: const Icon(Icons.search_rounded),
-                                    hintText: 'search_placeholder'.tr,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            GetX<NotificationsController>(
-                              builder: (notifier) => AppBadge(
-                                count: notifier.unreadCount,
-                                child: IconButton(
-                                  onPressed: controller.openNotifications,
-                                  icon: const Icon(Icons.notifications_rounded),
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: controller.openMyActivity,
-                              icon: const Icon(Icons.more_horiz),
-                            ),
-                            IconButton(
-                              onPressed: controller.openAddFlow,
-                              icon: const Icon(Icons.add_rounded),
-                            ),
-                          ],
-                        ),
+                        Text('app_name'.tr, style: theme.textTheme.titleLarge),
+                        Text('hero_subtitle'.tr, style: theme.textTheme.bodySmall),
                       ],
                     ),
-                  ),
+                    const Spacer(),
+                    FilledButton.tonal(
+                      onPressed: controller.toggleLocale,
+                      child: Text(settings.currentLocale.languageCode == 'ar' ? 'EN' : 'AR'),
+                    ),
+                  ],
                 ),
               ),
             ),
+            Expanded(
+              child: PageView(
+                controller: controller.pageController,
+                onPageChanged: controller.onPageChanged,
+                physics: const BouncingScrollPhysics(),
+                children: const [
+                  HomeView(),
+                  FavoritesView(),
+                  ProfileView(),
+                ],
+              ),
+            ),
           ],
-          body: PageView(
-            controller: controller.pageController,
-            onPageChanged: controller.onPageChanged,
-            physics: const ClampingScrollPhysics(),
-            children: const [
-              AuctionHomeView(),
-              DiscountsNearbyView(),
-              PriceWatchView(),
-              AiPricingView(),
-              ExploreView(),
-            ],
-          ),
         ),
       ),
       bottomNavigationBar: Obx(
         () => NavigationBar(
           selectedIndex: controller.pageIndex.value,
           onDestinationSelected: controller.onTabSelected,
+          height: 72,
           destinations: [
             NavigationDestination(
-              icon: const Icon(Icons.gavel_outlined),
-              selectedIcon: const Icon(Icons.gavel),
-              label: 'auction'.tr,
+              icon: const Icon(Icons.home_outlined),
+              selectedIcon: const Icon(Icons.home_rounded),
+              label: 'home'.tr,
             ),
             NavigationDestination(
-              icon: const Icon(Icons.local_offer_outlined),
-              selectedIcon: const Icon(Icons.local_offer),
-              label: 'nearby_discounts'.tr,
+              icon: const Icon(Icons.favorite_border_rounded),
+              selectedIcon: const Icon(Icons.favorite_rounded),
+              label: 'favorites'.tr,
             ),
             NavigationDestination(
-              icon: const Icon(Icons.visibility_outlined),
-              selectedIcon: const Icon(Icons.visibility),
-              label: 'price_watch'.tr,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.smart_toy_outlined),
-              selectedIcon: const Icon(Icons.smart_toy),
-              label: 'ai_pricing'.tr,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.explore_outlined),
-              selectedIcon: const Icon(Icons.explore),
-              label: 'explore'.tr,
+              icon: const Icon(Icons.person_outline_rounded),
+              selectedIcon: const Icon(Icons.person_rounded),
+              label: 'profile'.tr,
             ),
           ],
         ),
       ),
     );
-  }
-
-  String _pageTitle(int index) {
-    switch (index) {
-      case 0:
-        return 'auction';
-      case 1:
-        return 'nearby_discounts';
-      case 2:
-        return 'price_watch';
-      case 3:
-        return 'ai_pricing';
-      case 4:
-        return 'explore';
-      default:
-        return 'auction';
-    }
-  }
-
-  String _avatarUrl() {
-    final settings = Get.find<SettingsController>();
-    final user = settings.user.value;
-    if (user != null && user.avatarUrl.isNotEmpty) {
-      return user.avatarUrl;
-    }
-    return 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=60';
   }
 }
