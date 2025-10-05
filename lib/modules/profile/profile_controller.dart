@@ -13,9 +13,9 @@ class ProfileController extends GetxController {
   final WatchStoreRepository repository;
 
   late final List<AppFeature> features;
-  final enabledFeatures = <String>{}.obs;
-  final recentlyViewed = <WatchItem>[].obs;
-  final recentSearches = <String>[].obs;
+  final RxSet<String> enabledFeatures = RxSet<String>({});
+  final RxList<WatchItem> recentlyViewed = RxList<WatchItem>([]);
+  final RxList<String> recentSearches = RxList<String>([]);
 
   @override
   void onInit() {

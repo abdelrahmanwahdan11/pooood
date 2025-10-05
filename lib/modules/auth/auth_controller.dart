@@ -29,15 +29,15 @@ class AuthController extends GetxController {
   late final TextEditingController registerConfirmController;
   late final TextEditingController otpController;
 
-  final stage = AuthStage.login.obs;
-  final rememberMe = true.obs;
-  final obscurePassword = true.obs;
-  final acceptTerms = true.obs;
-  final isLoading = false.obs;
-  final isLoggedIn = false.obs;
-  final isGuest = false.obs;
-  final canResendCode = false.obs;
-  final countdown = 30.obs;
+  final Rx<AuthStage> stage = Rx<AuthStage>(AuthStage.login);
+  final RxBool rememberMe = RxBool(true);
+  final RxBool obscurePassword = RxBool(true);
+  final RxBool acceptTerms = RxBool(true);
+  final RxBool isLoading = RxBool(false);
+  final RxBool isLoggedIn = RxBool(false);
+  final RxBool isGuest = RxBool(false);
+  final RxBool canResendCode = RxBool(false);
+  final RxInt countdown = RxInt(30);
   final authError = RxnString();
 
   Timer? _timer;

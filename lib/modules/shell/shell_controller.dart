@@ -8,7 +8,7 @@ class ShellController extends GetxController {
 
   final SettingsRepository settingsRepository;
 
-  final pageIndex = 0.obs;
+  final RxInt pageIndex = RxInt(0);
   final PageController pageController = PageController();
   final scaffoldKey = GlobalKey<ScaffoldState>();
 

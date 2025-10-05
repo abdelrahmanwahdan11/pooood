@@ -13,10 +13,10 @@ class WatchDetailController extends GetxController {
   final SettingsRepository settingsRepository;
 
   final watch = Rxn<WatchItem>();
-  final colorIndex = 0.obs;
-  final selectedSize = ''.obs;
-  final isProcessing = false.obs;
-  final isFavorite = false.obs;
+  final RxInt colorIndex = RxInt(0);
+  final RxString selectedSize = RxString('');
+  final RxBool isProcessing = RxBool(false);
+  final RxBool isFavorite = RxBool(false);
 
   @override
   void onInit() {

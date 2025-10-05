@@ -12,9 +12,9 @@ class AuctionController extends GetxController {
   final AuctionsRepository auctionsRepository;
   final SettingsRepository settingsRepository;
 
-  final auctions = <Auction>[].obs;
-  final products = <int, Product>{}.obs;
-  final isLoading = false.obs;
+  final RxList<Auction> auctions = RxList<Auction>([]);
+  final RxMap<int, Product> products = RxMap<int, Product>({});
+  final RxBool isLoading = RxBool(false);
 
   @override
   void onInit() {

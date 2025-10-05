@@ -10,11 +10,11 @@ class DiscountsController extends GetxController {
   final DiscountsRepository repository;
   final SettingsRepository settingsRepository;
 
-  final discounts = <DiscountDeal>[].obs;
-  final filterDistance = 20.0.obs;
-  final filterCategory = ''.obs;
-  final minDiscount = 0.0.obs;
-  final onlyOpenNow = false.obs;
+  final RxList<DiscountDeal> discounts = RxList<DiscountDeal>([]);
+  final RxDouble filterDistance = RxDouble(20.0);
+  final RxString filterCategory = RxString('');
+  final RxDouble minDiscount = RxDouble(0.0);
+  final RxBool onlyOpenNow = RxBool(false);
 
   @override
   void onInit() {

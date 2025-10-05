@@ -12,9 +12,9 @@ class MyActivityController extends GetxController {
   final AuctionsRepository auctionsRepository;
   final DiscountsRepository discountsRepository;
 
-  final myAuctions = <Auction>[].obs;
-  final products = <int, Product>{}.obs;
-  final myDiscounts = <DiscountDeal>[].obs;
+  final RxList<Auction> myAuctions = RxList<Auction>([]);
+  final RxMap<int, Product> products = RxMap<int, Product>({});
+  final RxList<DiscountDeal> myDiscounts = RxList<DiscountDeal>([]);
 
   @override
   void onInit() {
