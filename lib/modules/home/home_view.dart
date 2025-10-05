@@ -43,19 +43,16 @@ class HomeView extends GetView<HomeController> {
                       HardShadowBox(
                         backgroundColor: palette.surface,
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GestureDetector(
-                              onTap: controller.toggleLanguage,
-                              child: const Icon(Icons.language, color: Colors.black),
-                            ),
-                            const SizedBox(width: 12),
-                            GestureDetector(
-                              onTap: controller.toggleTheme,
-                              child: const Icon(Icons.contrast, color: Colors.black),
-                            ),
-                          ],
+                        child: GestureDetector(
+                          onTap: controller.toggleLanguage,
+                          child: Icon(Icons.language, color: palette.highlight),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Obx(
+                        () => MarketplaceThemeToggleButton(
+                          isDark: appController.isMonochrome.value,
+                          onToggle: controller.toggleTheme,
                         ),
                       ),
                       const SizedBox(height: 12),
