@@ -1,57 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../core/routing/app_routes.dart';
-import '../../data/repositories/settings_repo.dart';
-import '../../data/repositories/watch_store_repo.dart';
+import '../../main.dart';
+import '../auth/auth_routes.dart';
 
 class OnboardingController extends GetxController {
-  OnboardingController(this.settingsRepository, this.watchStoreRepository);
+  final PageController pageController = PageController();
+  final RxInt pageIndex = 0.obs;
 
-  final SettingsRepository settingsRepository;
-  final WatchStoreRepository watchStoreRepository;
+  final slides = const [
+    'onboard_connect',
+    'onboard_trade',
+    'onboard_chat',
+  ];
 
-  final pageController = PageController();
-  final RxInt currentPage = RxInt(0);
-  late final List<String> slides;
+  AppController get appController => Get.find<AppController>();
 
-  @override
-  void onInit() {
-    slides = watchStoreRepository.onboardingKeys();
-    super.onInit();
-  }
+  void onPageChanged(int index) => pageIndex.value = index;
 
-  @override
-  void onClose() {
-    pageController.dispose();
-    super.onClose();
-  }
+  void skip() => finish();
 
-  void onPageChanged(int index) {
-    currentPage.value = index;
-  }
-
-  Future<void> next() async {
-    if (currentPage.value >= slides.length - 1) {
-      await complete();
-      return;
-    }
-    pageController.nextPage(
-      duration: const Duration(milliseconds: 420),
-      curve: Curves.easeOutQuart,
-    );
-  }
-
-  Future<void> skip() async {
-    await complete();
-  }
-
-  Future<void> complete() async {
-    await settingsRepository.completeOnboarding();
-    if (settingsRepository.authToken != null || settingsRepository.isGuestMode) {
-      Get.offAllNamed(AppRoutes.shell);
+  void next() {
+    if (pageIndex.value == slides.length - 1) {
+      finish();
     } else {
-      Get.offAllNamed(AppRoutes.auth);
+      pageController.nextPage(duration: const Duration(milliseconds: 320), curve: Curves.easeOut);
     }
   }
+
+  Future<void> finish() async {
+    await appController.completeOnboarding();
+    Get.offAllNamed(appController.initialRoute);
+  }
+
+  void goToAuth() => Get.offAllNamed(AuthRoutes.route);
 }

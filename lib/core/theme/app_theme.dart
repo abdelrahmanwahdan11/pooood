@@ -1,206 +1,119 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../data/repositories/settings_repo.dart';
+class ColorPalette {
+  const ColorPalette({
+    required this.background,
+    required this.surface,
+    required this.card,
+    required this.chat,
+    required this.accent,
+    required this.highlight,
+    required this.navbar,
+    required this.textPrimary,
+    required this.textOnSurface,
+    required this.caution,
+  });
+
+  final Color background;
+  final Color surface;
+  final Color card;
+  final Color chat;
+  final Color accent;
+  final Color highlight;
+  final Color navbar;
+  final Color textPrimary;
+  final Color textOnSurface;
+  final Color caution;
+
+  static ColorPalette colorful() => const ColorPalette(
+        background: Color(0xFFF7F453),
+        surface: Color(0xFFFEF7D4),
+        card: Color(0xFF82C93C),
+        chat: Color(0xFFF97453),
+        accent: Color(0xFF82C93C),
+        highlight: Color(0xFF000000),
+        navbar: Color(0xFFFEF7D4),
+        textPrimary: Color(0xFF000000),
+        textOnSurface: Color(0xFF000000),
+        caution: Color(0xFFF97453),
+      );
+
+  static ColorPalette monochrome() => const ColorPalette(
+        background: Color(0xFFF2F2F2),
+        surface: Color(0xFFE5E5E5),
+        card: Color(0xFFCCCCCC),
+        chat: Color(0xFF999999),
+        accent: Color(0xFF111111),
+        highlight: Color(0xFF000000),
+        navbar: Color(0xFFD9D9D9),
+        textPrimary: Color(0xFF000000),
+        textOnSurface: Color(0xFF000000),
+        caution: Color(0xFF444444),
+      );
+}
 
 class AppTheme {
-  static const Color background = Color(0xFF7CF2D3);
-  static const Color onSurface = Color(0xFF081C24);
-  static const Color accentPrimary = Color(0xFF141A37);
-  static const Color accentSuccess = Color(0xFFFF6584);
+  static ThemeData buildTheme({required bool isMonochrome}) {
+    final palette = isMonochrome ? ColorPalette.monochrome() : ColorPalette.colorful();
+    final textTheme = TextTheme(
+      displayLarge: GoogleFonts.bebasNeue(fontSize: 58, letterSpacing: 2.4, color: palette.textPrimary),
+      displayMedium: GoogleFonts.bebasNeue(fontSize: 42, letterSpacing: 2.0, color: palette.textPrimary),
+      headlineMedium: GoogleFonts.bebasNeue(fontSize: 36, letterSpacing: 1.8, color: palette.textPrimary),
+      bodyLarge: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: palette.textPrimary),
+      bodyMedium: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: palette.textPrimary),
+      bodySmall: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: palette.textPrimary),
+      titleLarge: GoogleFonts.bebasNeue(fontSize: 30, letterSpacing: 1.6, color: palette.textPrimary),
+      titleMedium: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700, color: palette.textPrimary),
+      labelLarge: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: palette.textPrimary),
+    );
 
-  static ThemeData buildThemeData(SettingsRepository settingsRepository) {
-    final density = settingsRepository.themeDensity;
-    final base = ThemeData(
-      useMaterial3: true,
-      textTheme: _buildTextTheme(),
-      fontFamily: GoogleFonts.readexPro().fontFamily,
-      colorScheme: ColorScheme(
-        brightness: Brightness.light,
-        primary: accentPrimary,
-        onPrimary: const Color(0xFFFAF9FB),
-        secondary: const Color(0xFF00D9A6),
-        onSecondary: onSurface,
-        surface: const Color(0xFFF9FFFE),
-        onSurface: onSurface,
-        background: background,
-        onBackground: onSurface,
-        error: const Color(0xFFFF4D67),
-        onError: Colors.white,
-        tertiary: const Color(0xFFEEF7FF),
-        onTertiary: onSurface,
-        surfaceVariant: const Color(0xFFE8FFF7),
-        outline: const Color(0x33081C24),
-        shadow: const Color(0x29081C24),
+    return ThemeData(
+      useMaterial3: false,
+      scaffoldBackgroundColor: palette.background,
+      primaryColor: palette.accent,
+      textTheme: textTheme,
+      colorScheme: ColorScheme.light(
+        primary: palette.accent,
+        secondary: palette.card,
+        surface: palette.surface,
+        background: palette.background,
+        error: palette.caution,
+        onPrimary: palette.textPrimary,
+        onSecondary: palette.textPrimary,
+        onSurface: palette.textOnSurface,
+        onBackground: palette.textPrimary,
+        onError: palette.textPrimary,
       ),
-      scaffoldBackgroundColor: background,
-      visualDensity: density == ThemeDensity.compact
-          ? VisualDensity.compact
-          : VisualDensity.standard,
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
+        backgroundColor: palette.background,
         elevation: 0,
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        foregroundColor: onSurface,
+        titleTextStyle: textTheme.headlineMedium,
+        iconTheme: IconThemeData(color: palette.textPrimary, size: 28),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: palette.navbar,
+        selectedItemColor: palette.textPrimary,
+        unselectedItemColor: palette.textPrimary.withOpacity(0.5),
+        selectedLabelStyle: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+        unselectedLabelStyle: GoogleFonts.poppins(fontWeight: FontWeight.w600),
       ),
       inputDecorationTheme: InputDecorationTheme(
+        fillColor: palette.surface,
         filled: true,
-        fillColor: Colors.white.withOpacity(0.45),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.32)),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.black, width: 3),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.22)),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.black, width: 3),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: accentPrimary, width: 1.4),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.black, width: 3),
         ),
-        labelStyle: TextStyle(
-          color: onSurface.withOpacity(0.72),
-          letterSpacing: 0.2,
-        ),
-      ),
-      chipTheme: ChipThemeData(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        labelStyle: GoogleFonts.readexPro(fontWeight: FontWeight.w600),
-        backgroundColor: Colors.white.withOpacity(0.4),
-        selectedColor: const Color(0xFF141A37).withOpacity(0.15),
-      ),
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: Colors.white.withOpacity(0.35),
-        elevation: 0,
-        indicatorColor: const Color(0xFF141A37).withOpacity(0.24),
-        iconTheme: MaterialStateProperty.resolveWith(
-          (states) => IconThemeData(
-            color: states.contains(MaterialState.selected)
-                ? onSurface
-                : onSurface.withOpacity(0.7),
-          ),
-        ),
-      ),
-      snackBarTheme: SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.black.withOpacity(0.85),
-        contentTextStyle: GoogleFonts.readexPro(color: Colors.white),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-    );
-    return base.copyWith(
-      pageTransitionsTheme: const PageTransitionsTheme(
-        builders: {
-          TargetPlatform.android: _FadeSlideTransitionsBuilder(),
-          TargetPlatform.iOS: _FadeSlideTransitionsBuilder(),
-          TargetPlatform.macOS: _FadeSlideTransitionsBuilder(),
-          TargetPlatform.linux: _FadeSlideTransitionsBuilder(),
-          TargetPlatform.windows: _FadeSlideTransitionsBuilder(),
-        },
-      ),
-    );
-  }
-
-  static TextTheme _buildTextTheme() {
-    final base = GoogleFonts.readexProTextTheme();
-    return base.copyWith(
-      displayLarge: base.displayLarge?.copyWith(
-        fontSize: 44,
-        fontWeight: FontWeight.w700,
-        color: onSurface,
-      ),
-      displayMedium: base.displayMedium?.copyWith(
-        fontSize: 36,
-        fontWeight: FontWeight.w600,
-        color: onSurface,
-      ),
-      displaySmall: base.displaySmall?.copyWith(
-        fontSize: 30,
-        fontWeight: FontWeight.w600,
-        color: onSurface,
-      ),
-      headlineMedium: base.headlineMedium?.copyWith(
-        fontSize: 26,
-        fontWeight: FontWeight.w600,
-        color: onSurface,
-      ),
-      headlineSmall: base.headlineSmall?.copyWith(
-        fontSize: 22,
-        fontWeight: FontWeight.w600,
-        color: onSurface,
-      ),
-      titleLarge: base.titleLarge?.copyWith(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: onSurface,
-      ),
-      titleMedium: base.titleMedium?.copyWith(
-        fontSize: 18,
-        fontWeight: FontWeight.w500,
-        color: onSurface,
-      ),
-      titleSmall: base.titleSmall?.copyWith(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        color: onSurface,
-      ),
-      bodyLarge: base.bodyLarge?.copyWith(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        color: onSurface,
-      ),
-      bodyMedium: base.bodyMedium?.copyWith(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        color: onSurface,
-      ),
-      bodySmall: base.bodySmall?.copyWith(
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-        color: onSurface.withOpacity(0.8),
-      ),
-      labelLarge: base.labelLarge?.copyWith(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: onSurface,
-      ),
-      labelMedium: base.labelMedium?.copyWith(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        color: onSurface,
-      ),
-      labelSmall: base.labelSmall?.copyWith(
-        fontSize: 11,
-        fontWeight: FontWeight.w500,
-        color: onSurface,
       ),
     );
   }
 }
-
-class _FadeSlideTransitionsBuilder extends PageTransitionsBuilder {
-  const _FadeSlideTransitionsBuilder();
-
-  @override
-  Widget buildTransitions<T>(
-    PageRoute<T> route,
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
-    return FadeTransition(
-      opacity: curved,
-      child: SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0.05, 0.05),
-          end: Offset.zero,
-        ).animate(curved),
-        child: child,
-      ),
-    );
-  }
-}
-
-enum ThemeDensity { cozy, compact }
