@@ -11,7 +11,7 @@ class FavoritesController extends GetxController {
   final WatchStoreRepository repository;
   final SettingsRepository settingsRepository;
 
-  final items = <WatchItem>[].obs;
+  final RxList<WatchItem> items = RxList<WatchItem>([]);
 
   @override
   void onInit() {

@@ -16,17 +16,17 @@ class HomeController extends GetxController {
   static const int _pageSize = 6;
 
   final pagingController = PagingController<int, WatchItem>(firstPageKey: 0);
-  final activeCollection = 'all'.obs;
-  final searchQuery = ''.obs;
-  final appliedFilters = <String>[].obs;
-  final isRefreshing = false.obs;
-  final featuredItems = <WatchItem>[].obs;
+  final RxString activeCollection = RxString('all');
+  final RxString searchQuery = RxString('');
+  final RxList<String> appliedFilters = RxList<String>([]);
+  final RxBool isRefreshing = RxBool(false);
+  final RxList<WatchItem> featuredItems = RxList<WatchItem>([]);
   late final RxSet<int> favoriteIds;
   final TextEditingController searchFieldController = TextEditingController();
 
   @override
   void onInit() {
-    favoriteIds = settingsRepository.favoriteWatchIds.toSet().obs;
+    favoriteIds = RxSet<int>(settingsRepository.favoriteWatchIds.toSet());
     pagingController.addPageRequestListener(_fetchPage);
     _loadFeatured();
     super.onInit();

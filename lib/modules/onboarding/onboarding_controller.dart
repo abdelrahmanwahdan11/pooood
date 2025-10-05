@@ -12,7 +12,7 @@ class OnboardingController extends GetxController {
   final WatchStoreRepository watchStoreRepository;
 
   final pageController = PageController();
-  final currentPage = 0.obs;
+  final RxInt currentPage = RxInt(0);
   late final List<String> slides;
 
   @override

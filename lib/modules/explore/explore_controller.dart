@@ -17,12 +17,12 @@ class ExploreController extends GetxController {
   final DiscountsRepository discountsRepository;
   final SettingsRepository settingsRepository;
 
-  final auctions = <Auction>[].obs;
-  final products = <int, Product>{}.obs;
-  final discounts = <DiscountDeal>[].obs;
-  final filterType = ExploreFilter.both.obs;
-  final distanceLimit = 30.0.obs;
-  final selectedCategory = ''.obs;
+  final RxList<Auction> auctions = RxList<Auction>([]);
+  final RxMap<int, Product> products = RxMap<int, Product>({});
+  final RxList<DiscountDeal> discounts = RxList<DiscountDeal>([]);
+  final Rx<ExploreFilter> filterType = Rx<ExploreFilter>(ExploreFilter.both);
+  final RxDouble distanceLimit = RxDouble(30.0);
+  final RxString selectedCategory = RxString('');
 
   @override
   void onInit() {

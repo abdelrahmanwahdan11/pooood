@@ -8,7 +8,7 @@ class NotificationsController extends GetxController {
 
   final NotificationsRepository repository;
 
-  final notifications = <NotificationItem>[].obs;
+  final RxList<NotificationItem> notifications = RxList<NotificationItem>([]);
 
   @override
   void onInit() {

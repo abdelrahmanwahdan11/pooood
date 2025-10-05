@@ -13,7 +13,7 @@ class PricingController extends GetxController {
   final AuctionsRepository auctionsRepository;
   final SettingsRepository settingsRepository;
 
-  final isCalculating = false.obs;
+  final RxBool isCalculating = RxBool(false);
   final Rxn<PricingResult> result = Rxn<PricingResult>();
   final Rxn<PricingRequest> lastRequest = Rxn<PricingRequest>();
 

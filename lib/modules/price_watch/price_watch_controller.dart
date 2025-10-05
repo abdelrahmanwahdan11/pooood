@@ -8,8 +8,8 @@ class PriceWatchController extends GetxController {
 
   final WatchesRepository repository;
 
-  final watches = <PriceWatch>[].obs;
-  final isLoading = false.obs;
+  final RxList<PriceWatch> watches = RxList<PriceWatch>([]);
+  final RxBool isLoading = RxBool(false);
 
   @override
   void onInit() {
