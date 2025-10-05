@@ -13,6 +13,9 @@ import '../onboarding/onboarding_routes.dart';
 import '../onboarding/onboarding_view.dart';
 import '../product/product_routes.dart';
 import '../product/product_view.dart';
+import '../trust/trust_binding.dart';
+import '../trust/trust_routes.dart';
+import '../trust/trust_view.dart';
 
 class RootShell extends GetView<AppController> {
   const RootShell({super.key});
@@ -27,6 +30,7 @@ class RootShell extends GetView<AppController> {
         GetPage(name: HomeRoutes.ideasRoute, page: IdeasView.new),
         GetPage(name: ProductRoutes.route, page: ProductView.new),
         GetPage(name: ChatRoutes.route, page: ChatView.new),
+        GetPage(name: TrustRoutes.route, page: TrustView.new, binding: TrustBinding()),
       ];
 
   @override

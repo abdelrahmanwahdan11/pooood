@@ -18,6 +18,11 @@ class ProductRepository {
     return _cache.sublist(start, end);
   }
 
+  static List<Product> allProducts() {
+    _cache = _cache.isEmpty ? _generateProducts() : _cache;
+    return List<Product>.from(_cache);
+  }
+
   static Map<String, double> decodeRatings(String source) {
     final map = jsonDecode(source) as Map<String, dynamic>;
     return map.map((key, value) => MapEntry(key, (value as num).toDouble()));
@@ -143,6 +148,36 @@ class FeatureIdeaRepository {
       'Smart packaging return flow',
       'Donation matching program',
       'In-store pickup reservations',
+      'Marketplace guild profiles with endorsements',
+      'Dynamic vendor trust heatmaps',
+      'In-app documentation builder',
+      'Collaborative storefront editor',
+      'Integrated sustainability pledges',
+      'On-demand maker insurance options',
+      'Predictive demand planning dashboard',
+      'Shared reality livestream showrooms',
+      'Immersive audio tours for products',
+      'Autonomous courier coordination',
+      'Smart contract escrow analytics',
+      'User-generated style lookbooks',
+      'Virtual queue management for drops',
+      'Advanced barter negotiation room',
+      'Voice-to-text negotiation transcripts',
+      'Remote diagnostics for hardware',
+      'Custom data export studio',
+      'Integrated maker education hub',
+      'AI-driven bundle composer',
+      'Embedded carbon ledger explorer',
+      'Offline pop-up sync support',
+      'Hardware rental subscription management',
+      'Geo-fenced campaign triggers',
+      'Multi-vendor checkout flows',
+      'Creator royalty tracking',
+      'Augmented packaging instructions',
+      'Donation impact visualizer',
+      'Wholesale partner onboarding',
+      'Community dispute mediation room',
+      'Talent marketplace for pop-up staff',
     ];
 
     final ideasAr = <String>[
@@ -176,9 +211,39 @@ class FeatureIdeaRepository {
       'تدفق لإرجاع التغليف الذكي',
       'برنامج مطابقة التبرعات',
       'حجوزات الاستلام من المتجر',
+      'ملفات تعريف النقابات مع توصيات',
+      'خرائط حرارية لثقة الموردين',
+      'منشئ وثائق داخل التطبيق',
+      'محرر واجهات المتجر التعاوني',
+      'عهود استدامة مدمجة',
+      'خيارات تأمين للمبدعين عند الطلب',
+      'لوحة تخطيط الطلب التنبؤية',
+      'صالات عرض بالبث المشترك المعزز',
+      'جولات صوتية غامرة للمنتجات',
+      'تنسيق المرسلين المستقلين',
+      'تحليلات الضمان بالعقود الذكية',
+      'ألبومات أنماط من إنشاء المستخدم',
+      'إدارة طوابير افتراضية للإصدارات',
+      'غرفة تفاوض متقدمة للمقايضة',
+      'تفريغ صوتي فوري للمفاوضات',
+      'تشخيصات عن بعد للأجهزة',
+      'استوديو تصدير بيانات مخصص',
+      'منصة تعليم للمبدعين مدمجة',
+      'منشئ حزم بالذكاء الاصطناعي',
+      'مستكشف دفتر الكربون المضمن',
+      'دعم مزامنة المتاجر المؤقتة دون اتصال',
+      'إدارة اشتراك إيجار المعدات',
+      'مشغلات حملات محددة بالموقع',
+      'تدفقات دفع متعددة الموردين',
+      'تتبع عوائد المبدعين',
+      'تعليمات تغليف معززة بالواقع',
+      'مرئي أثر التبرعات',
+      'إعداد شركاء الجملة',
+      'غرفة وساطة نزاعات مجتمعية',
+      'سوق مواهب لفرق المتاجر المؤقتة',
     ];
 
-    return List.generate(30, (index) {
+    return List.generate(60, (index) {
       return FeatureIdea(
         index: index + 1,
         textEn: ideasEn[index],

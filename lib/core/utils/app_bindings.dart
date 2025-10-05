@@ -6,6 +6,7 @@ import '../../modules/chat/chat_binding.dart';
 import '../../modules/home/home_binding.dart';
 import '../../modules/onboarding/onboarding_binding.dart';
 import '../../modules/product/product_binding.dart';
+import '../../modules/trust/trust_binding.dart';
 
 class AppBindings extends Bindings {
   AppBindings();
@@ -17,5 +18,6 @@ class AppBindings extends Bindings {
     HomeBinding().dependencies();
     ProductBinding().dependencies();
     ChatBinding().dependencies();
+    TrustBinding().dependencies();
   }
 }
