@@ -1,114 +1,154 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../../data/models/watch_item.dart';
-import '../../data/repositories/settings_repo.dart';
-import '../../data/repositories/watch_store_repo.dart';
-import '../profile/profile_controller.dart';
+import '../../core/widgets/hard_shadow_box.dart';
+import '../../main.dart';
+import '../../models/locale_text.dart';
+import '../../models/marketplace_meta.dart';
+import '../../models/product.dart';
+import '../chat/chat_routes.dart';
+import '../product/product_routes.dart';
+import '../trust/trust_routes.dart';
+import 'home_routes.dart';
 
 class HomeController extends GetxController {
-  HomeController(this.repository, this.settingsRepository);
-
-  final WatchStoreRepository repository;
-  final SettingsRepository settingsRepository;
-
-  static const int _pageSize = 6;
-
-  final pagingController = PagingController<int, WatchItem>(firstPageKey: 0);
-  final RxString activeCollection = RxString('all');
-  final RxString searchQuery = RxString('');
-  final RxList<String> appliedFilters = RxList<String>([]);
-  final RxBool isRefreshing = RxBool(false);
-  final RxList<WatchItem> featuredItems = RxList<WatchItem>([]);
-  late final RxSet<int> favoriteIds;
-  final TextEditingController searchFieldController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
+  AppController get appController => Get.find<AppController>();
 
   @override
   void onInit() {
-    favoriteIds = RxSet<int>(settingsRepository.favoriteWatchIds.toSet());
-    pagingController.addPageRequestListener(_fetchPage);
-    _loadFeatured();
     super.onInit();
+    scrollController.addListener(_handleScroll);
+  }
+
+  List<Product> get products => appController.visibleProducts;
+  List<CategoryTag> get categories => appController.categoryTags;
+  Set<String> get selectedCategories => appController.selectedCategories;
+  String get sortLabel => appController.sortLabel;
+  List<HighlightMetric> get highlights => appController.marketHighlights;
+  List<LocaleText> get liveMoments => appController.liveMoments;
+  List<MarketplaceCollection> get collections => appController.collections;
+  List<Product> get compareList => appController.compareProducts();
+  bool get hasSavedSearch => appController.hasSavedSearch.value;
+  List<MarketplaceStory> get trustStories => appController.trustStories;
+  List<Vendor> get vendors => appController.vendors;
+
+  Future<void> refresh() async {
+    await appController.refreshProducts();
+  }
+
+  void _handleScroll() {
+    if (scrollController.position.extentAfter < 300 && appController.hasMoreProducts.value) {
+      appController.loadMore();
+    }
+  }
+
+  void toggleTheme() => appController.toggleTheme();
+
+  void toggleLanguage() => appController.toggleLanguage();
+
+  void openProduct(Product product) {
+    Get.toNamed(ProductRoutes.route, arguments: product);
+  }
+
+  void openChat() => Get.toNamed(ChatRoutes.route);
+
+  void openFeatureIdeas() => Get.toNamed(HomeRoutes.ideasRoute);
+
+  void openTrustCenter() => Get.toNamed(TrustRoutes.route);
+
+  void toggleCategory(String id) => appController.toggleCategory(id);
+
+  void cycleSort() => appController.cycleSortMode();
+
+  ProductMeta metaFor(Product product) => appController.metaFor(product.id);
+
+  bool isCompared(Product product) => appController.isCompared(product);
+
+  Future<void> toggleCompare(Product product) => appController.toggleCompare(product);
+
+  List<Product> collectionPreview(MarketplaceCollection collection) => appController.collectionProducts(collection);
+
+  Future<void> runQuickAction(String id) async {
+    if (id == 'trust') {
+      openTrustCenter();
+      return;
+    }
+    if (id == 'share') {
+      appController.shareMarketplace();
+      return;
+    }
+    if (id == 'save') {
+      await appController.toggleSavedSearch();
+      return;
+    }
+  }
+
+  void openComparison() {
+    final items = compareList;
+    if (items.isEmpty) return;
+    final palette = appController.palette;
+    Get.dialog(
+      Center(
+        child: HardShadowBox(
+          backgroundColor: palette.surface,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('compare_drawer_title'.tr, style: Get.textTheme.headlineMedium),
+              const SizedBox(height: 12),
+              ...items.map(
+                (product) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Text(product.name(Get.locale ?? const Locale('en')).toUpperCase(), style: Get.textTheme.bodyMedium),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text('compare_dialog_hint'.tr, style: Get.textTheme.bodySmall),
+            ],
+          ),
+        ),
+      ),
+      barrierColor: Colors.black.withOpacity(0.55),
+    );
+  }
+
+  void openCollection(MarketplaceCollection collection) {
+    final items = collectionPreview(collection);
+    final palette = appController.palette;
+    final locale = Get.locale ?? const Locale('en');
+    Get.dialog(
+      Center(
+        child: HardShadowBox(
+          backgroundColor: palette.surface,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(collection.title.resolve(locale), style: Get.textTheme.headlineMedium),
+              const SizedBox(height: 12),
+              Text(collection.description.resolve(locale), style: Get.textTheme.bodySmall),
+              const SizedBox(height: 12),
+              ...items.map(
+                (product) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(product.name(locale), style: Get.textTheme.bodyMedium),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierColor: Colors.black.withOpacity(0.55),
+    );
   }
 
   @override
   void onClose() {
-    pagingController.dispose();
-    searchFieldController.dispose();
+    scrollController.dispose();
     super.onClose();
-  }
-
-  Future<void> _loadFeatured() async {
-    final list = await repository.fetchWatches(page: 0, limit: 3);
-    featuredItems.assignAll(list);
-  }
-
-  Future<void> _fetchPage(int pageKey) async {
-    try {
-      final items = await repository.fetchWatches(
-        page: pageKey,
-        limit: _pageSize,
-        query: searchQuery.value,
-        collection: activeCollection.value,
-      );
-      final isLastPage = items.length < _pageSize;
-      if (isLastPage) {
-        pagingController.appendLastPage(items);
-      } else {
-        final nextKey = pageKey + 1;
-        pagingController.appendPage(items, nextKey);
-      }
-    } catch (error) {
-      pagingController.error = error;
-    }
-  }
-
-  Future<void> refresh() async {
-    isRefreshing.value = true;
-    pagingController.refresh();
-    await _loadFeatured();
-    isRefreshing.value = false;
-  }
-
-  void onCollectionSelected(String collection) {
-    activeCollection.value = collection;
-    refresh();
-  }
-
-  void onSearchChanged(String query) {
-    searchQuery.value = query;
-    settingsRepository.addRecentSearch(query);
-    if (Get.isRegistered<ProfileController>()) {
-      Get.find<ProfileController>().refreshHistory();
-    }
-    refresh();
-  }
-
-  void toggleFilter(String filter) {
-    if (appliedFilters.contains(filter)) {
-      appliedFilters.remove(filter);
-    } else {
-      appliedFilters.add(filter);
-    }
-  }
-
-  void toggleFavorite(WatchItem item) {
-    if (favoriteIds.contains(item.id)) {
-      favoriteIds.remove(item.id);
-    } else {
-      favoriteIds.add(item.id);
-    }
-    favoriteIds.refresh();
-    settingsRepository.toggleFavoriteWatch(item.id);
-  }
-
-  bool isFavorite(WatchItem item) => favoriteIds.contains(item.id);
-
-  Future<void> recordView(WatchItem item) async {
-    await settingsRepository.updateRecentlyViewed(item.id);
-    if (Get.isRegistered<ProfileController>()) {
-      Get.find<ProfileController>().refreshHistory();
-    }
   }
 }
