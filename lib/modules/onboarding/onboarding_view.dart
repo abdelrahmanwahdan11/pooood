@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/glass_container.dart';
+import '../../core/widgets/hard_shadow_box.dart';
+import '../../main.dart';
+import '../auth/auth_routes.dart';
 import 'onboarding_controller.dart';
+import 'onboarding_routes.dart';
 
 class OnboardingView extends GetView<OnboardingController> {
   const OnboardingView({super.key});
 
+  static const route = OnboardingRoutes.route;
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final palette = Get.find<AppController>().palette;
     return Scaffold(
+      backgroundColor: palette.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -21,22 +26,19 @@ class OnboardingView extends GetView<OnboardingController> {
             children: [
               Row(
                 children: [
-                  GlassContainer(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      'app_name'.tr,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: AppTheme.accentPrimary,
-                      ),
-                    ),
+                  HardShadowBox(
+                    backgroundColor: palette.card,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    child: Text('brand_title'.tr, style: Theme.of(context).textTheme.displayMedium),
                   ),
                   const Spacer(),
                   TextButton(
                     onPressed: controller.skip,
-                    child: Text('skip'.tr),
+                    child: Text('skip'.tr, style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ],
               ),
+              Text('brand_subtitle'.tr.toUpperCase(), style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 24),
               Expanded(
                 child: PageView.builder(
@@ -45,11 +47,12 @@ class OnboardingView extends GetView<OnboardingController> {
                   physics: const BouncingScrollPhysics(),
                   itemCount: controller.slides.length,
                   itemBuilder: (context, index) {
-                    final key = controller.slides[index];
+                    final prefix = controller.slides[index];
                     return _OnboardingCard(
-                      title: '${key}_title'.tr,
-                      subtitle: '${key}_subtitle'.tr,
-                      badge: '${key}_badge'.tr,
+                      palette: palette,
+                      badge: '${prefix}_badge'.tr,
+                      title: '${prefix}_title'.tr,
+                      subtitle: '${prefix}_subtitle'.tr,
                       index: index,
                     );
                   },
@@ -63,30 +66,45 @@ class OnboardingView extends GetView<OnboardingController> {
                       children: List.generate(
                         controller.slides.length,
                         (index) => AnimatedContainer(
-                          duration: const Duration(milliseconds: 280),
+                          duration: const Duration(milliseconds: 240),
+                          height: 12,
+                          width: controller.pageIndex.value == index ? 36 : 12,
                           margin: const EdgeInsets.symmetric(horizontal: 4),
-                          height: 8,
-                          width: controller.currentPage.value == index ? 24 : 8,
                           decoration: BoxDecoration(
-                            color: controller.currentPage.value == index
-                                ? AppTheme.accentPrimary
-                                : Colors.white.withOpacity(0.4),
+                            color: palette.card,
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.black, width: 3),
                           ),
                         ),
                       ),
                     ),
                     const Spacer(),
-                    FilledButton.icon(
-                      onPressed: controller.next,
-                      icon: const Icon(Icons.arrow_forward_rounded),
-                      label: Text(
-                        controller.currentPage.value == controller.slides.length - 1
-                            ? 'start_now'.tr
-                            : 'next'.tr,
+                    HardShadowBox(
+                      backgroundColor: palette.surface,
+                      child: GestureDetector(
+                        onTap: controller.next,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              controller.pageIndex.value == controller.slides.length - 1 ? 'start_now'.tr : 'next'.tr,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                            const SizedBox(width: 12),
+                            const Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 28),
+                          ],
+                        ),
                       ),
-                    ).animate().fadeIn().slideX(begin: 0.2),
+                    ),
                   ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Get.offAllNamed(AuthRoutes.route),
+                  child: Text('sign_in'.tr, style: Theme.of(context).textTheme.bodyMedium),
                 ),
               ),
             ],
@@ -99,85 +117,58 @@ class OnboardingView extends GetView<OnboardingController> {
 
 class _OnboardingCard extends StatelessWidget {
   const _OnboardingCard({
+    required this.palette,
+    required this.badge,
     required this.title,
     required this.subtitle,
-    required this.badge,
     required this.index,
   });
 
+  final ColorPalette palette;
+  final String badge;
   final String title;
   final String subtitle;
-  final String badge;
   final int index;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final heroColor = [
-      const Color(0xFF141A37),
-      const Color(0xFF00D9A6),
-      const Color(0xFFFF6584),
-    ][index % 3];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: GlassContainer(
-            borderRadius: 36,
-            padding: const EdgeInsets.all(24),
-            gradient: LinearGradient(
-              colors: [heroColor.withOpacity(0.85), heroColor.withOpacity(0.55)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: HardShadowBox(
+        backgroundColor: palette.surface,
+        borderRadius: 32,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            HardShadowBox(
+              backgroundColor: palette.card,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: Text(badge.toUpperCase(), style: Theme.of(context).textTheme.labelLarge),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: GlassContainer(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    child: Text(
-                      badge,
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: AppTheme.onSurface,
-                      ),
-                    ),
-                  ).animate().fadeIn(delay: 200.ms).slideY(begin: -0.2, end: 0),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  title,
-                  style: theme.textTheme.displaySmall?.copyWith(
-                    color: Colors.white,
-                  ),
-                ).animate().fadeIn().slideY(begin: 0.4, end: 0),
-                const Spacer(),
-                Container(
-                  height: 220,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.22),
-                    borderRadius: BorderRadius.circular(28),
-                  ),
-                  alignment: Alignment.center,
+            const SizedBox(height: 24),
+            Text(title.toUpperCase(), style: Theme.of(context).textTheme.headlineMedium),
+            const SizedBox(height: 16),
+            Expanded(
+              child: Align(
+                alignment: Alignment.center,
+                child: HardShadowBox(
+                  backgroundColor: index % 2 == 0 ? palette.card : palette.surface,
+                  borderRadius: 48,
+                  padding: const EdgeInsets.all(32),
                   child: Icon(
-                    Icons.watch_rounded,
+                    [Icons.shopping_bag, Icons.auto_awesome_mosaic, Icons.chat_bubble][index],
                     size: 120,
-                    color: Colors.white.withOpacity(0.8),
-                  ),
-                ).animate().fadeIn(delay: 120.ms).scale(begin: const Offset(0.9, 0.9)),
-                const SizedBox(height: 24),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: Colors.white.withOpacity(0.92),
+                    color: Colors.black,
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+            const SizedBox(height: 16),
+            Text(subtitle, style: Theme.of(context).textTheme.bodyLarge),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
