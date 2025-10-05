@@ -638,6 +638,8 @@ class _ProductCard extends StatelessWidget {
                   )
                   .toList(),
             ),
+            const SizedBox(width: 12),
+            const Icon(Icons.arrow_forward_ios, color: Colors.black),
           ],
         ),
       ),
