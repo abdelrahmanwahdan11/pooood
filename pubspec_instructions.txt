@@ -1,0 +1,16 @@
+Required dependencies:
+- get
+- flutter_animate
+- google_fonts
+- responsive_builder
+- flutter_svg
+- shared_preferences
+- lottie
+- image_picker
+- intl
+- infinite_scroll_pagination
+- staggered_grid_view_flutter (use latest version available)
+- carousel_view (replace with local CarouselView widget as implemented)
+
+After updating pubspec.yaml run:
+flutter pub get
