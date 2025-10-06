@@ -1,26 +1,71 @@
-/*
-  هذا الملف يعرّف الثيم العام للتطبيق بالحالتين الفاتحة والداكنة.
-  يمكن تعديل الألوان والخطوط بسهولة أو إضافة ثيمات جديدة لاحقاً.
-*/
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import 'app_colors.dart';
 
 class AppTheme {
-  static ThemeData lightTheme = ThemeData(
-    brightness: Brightness.light,
-    primarySwatch: Colors.indigo,
-    scaffoldBackgroundColor: const Color(0xFFF4F6FA),
-    textTheme: GoogleFonts.cairoTextTheme(),
-    colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+  static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
+    brightness: Brightness.light,
+    fontFamily: 'Gilroy',
+    colorScheme: const ColorScheme.light(
+      primary: AppColors.primaryBlue,
+      secondary: AppColors.primaryYellow,
+      tertiary: AppColors.primaryPink,
+      background: AppColors.lightBackground,
+      surface: AppColors.surfaceLight,
+    ),
+    scaffoldBackgroundColor: AppColors.lightBackground,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      foregroundColor: AppColors.textDark,
+      elevation: 0,
+      centerTitle: true,
+    ),
+    cardTheme: CardTheme(
+      color: AppColors.surfaceLight,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: BorderSide.none,
+      ),
+    ),
   );
 
-  static ThemeData darkTheme = ThemeData(
-    brightness: Brightness.dark,
-    primarySwatch: Colors.indigo,
-    scaffoldBackgroundColor: const Color(0xFF10121A),
-    textTheme: GoogleFonts.cairoTextTheme(ThemeData.dark().textTheme),
-    colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo, brightness: Brightness.dark),
+  static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
+    brightness: Brightness.dark,
+    fontFamily: 'Gilroy',
+    colorScheme: const ColorScheme.dark(
+      primary: Color(0xFF6FA8FF),
+      secondary: Color(0xFFFFE257),
+      tertiary: Color(0xFFFF8A90),
+      background: AppColors.darkBackground,
+      surface: AppColors.surfaceDark,
+    ),
+    scaffoldBackgroundColor: AppColors.darkBackground,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      foregroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+    ),
+    cardTheme: CardTheme(
+      color: AppColors.surfaceDark,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: const Color(0xFF1E1E1E),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: BorderSide.none,
+      ),
+    ),
   );
 }

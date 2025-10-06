@@ -1,5 +1,12 @@
-/*
-  هذا الملف يوجّه نقطة الدخول الافتراضية في Flutter إلى التطبيق المنظم داخل مجلد app.
-  يمكن تعديل هذا الملف لإضافة إعدادات منصات خاصة قبل استدعاء التطبيق الرئيسي.
-*/
-export 'app/main.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'app/core/bindings/initial_binding.dart';
+import 'app/core/services/settings_service.dart';
+import 'app/main_app.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Get.putAsync<SettingsService>(() => SettingsService().init());
+  runApp(const MindMirrorApp());
+}
