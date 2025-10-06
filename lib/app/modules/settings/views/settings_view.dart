@@ -1,12 +1,7 @@
-/*
-  هذا الملف يبني واجهة الإعدادات مع خيارات اللغة والثيم والتنبيهات المحاكية.
-  يمكن تطويره لإضافة صفحات فرعية أو دمج خدمات خارجية لاحقاً.
-*/
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 
-import '../../../routes/app_routes.dart';
+import '../../../core/utils/layout_helper.dart';
 import '../controllers/settings_controller.dart';
 
 class SettingsView extends GetView<SettingsController> {
@@ -14,111 +9,49 @@ class SettingsView extends GetView<SettingsController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text('settings.title'.tr)),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 3,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Get.offAllNamed(AppRoutes.home);
-              break;
-            case 1:
-              Get.toNamed(AppRoutes.wishlist);
-              break;
-            case 2:
-              Get.toNamed(AppRoutes.myBids);
-              break;
-            default:
-              break;
-          }
-        },
-        items: [
-          BottomNavigationBarItem(icon: const Icon(Icons.home), label: 'nav.home'.tr),
-          BottomNavigationBarItem(icon: const Icon(Icons.favorite), label: 'nav.wishlist'.tr),
-          BottomNavigationBarItem(icon: const Icon(Icons.local_offer), label: 'nav.mybids'.tr),
-          BottomNavigationBarItem(icon: const Icon(Icons.settings), label: 'nav.settings'.tr),
-        ],
-      ),
-      body: Obx(() => ListView(
-            padding: const EdgeInsets.all(16),
+      appBar: AppBar(title: Text('settings'.tr)),
+      body: LayoutHelper.constrain(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('settings.language'.tr, style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 8),
+              Text('settings_title'.tr, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 24),
+              Text('theme'.tr, style: theme.textTheme.titleMedium),
+              const SizedBox(height: 12),
+              SegmentedButton<ThemeMode>(
+                segments: [
+                  ButtonSegment(value: ThemeMode.light, label: Text('light_mode'.tr), icon: const Icon(Icons.light_mode)),
+                  ButtonSegment(value: ThemeMode.dark, label: Text('dark_mode'.tr), icon: const Icon(Icons.dark_mode)),
+                  ButtonSegment(value: ThemeMode.system, label: Text('system_mode'.tr), icon: const Icon(Icons.brightness_auto)),
+                ],
+                selected: {controller.themeMode},
+                onSelectionChanged: (selection) => controller.changeTheme(selection.first),
+              ),
+              const SizedBox(height: 24),
+              Text('language'.tr, style: theme.textTheme.titleMedium),
+              const SizedBox(height: 12),
               Wrap(
                 spacing: 12,
-                children: [
-                  ChoiceChip(
-                    label: const Text('العربية'),
-                    selected: Get.locale?.languageCode == 'ar',
-                    onSelected: (value) => controller.changeLanguage(const Locale('ar', 'SA')),
-                  ),
-                  ChoiceChip(
-                    label: const Text('English'),
-                    selected: Get.locale?.languageCode == 'en',
-                    onSelected: (value) => controller.changeLanguage(const Locale('en', 'US')),
-                  ),
-                ],
+                children: controller.locales
+                    .map(
+                      (locale) => ChoiceChip(
+                        label: Text(locale.languageCode.toUpperCase()),
+                        selected: controller.locale.languageCode == locale.languageCode,
+                        onSelected: (_) => controller.changeLocale(locale),
+                      ),
+                    )
+                    .toList(),
               ),
-              const SizedBox(height: 24),
-              Text('settings.theme'.tr, style: Theme.of(context).textTheme.titleMedium),
-              RadioListTile<ThemeMode>(
-                value: ThemeMode.system,
-                groupValue: controller.themeMode.value,
-                onChanged: (value) {
-                  if (value != null) controller.setTheme(value);
-                },
-                title: Text('settings.systemMode'.tr),
-              ),
-              RadioListTile<ThemeMode>(
-                value: ThemeMode.light,
-                groupValue: controller.themeMode.value,
-                onChanged: (value) {
-                  if (value != null) controller.setTheme(value);
-                },
-                title: Text('settings.lightMode'.tr),
-              ),
-              RadioListTile<ThemeMode>(
-                value: ThemeMode.dark,
-                groupValue: controller.themeMode.value,
-                onChanged: (value) {
-                  if (value != null) controller.setTheme(value);
-                },
-                title: Text('settings.darkMode'.tr),
-              ),
-              const SizedBox(height: 24),
-              SwitchListTile(
-                value: controller.notificationsEnabled.value,
-                onChanged: controller.toggleNotifications,
-                title: Text('settings.notifications'.tr),
-                subtitle: Text('notifications.placeholder'.tr),
-              ),
-              SwitchListTile(
-                value: controller.isOffline.value,
-                onChanged: controller.toggleOffline,
-                title: Text('settings.offline'.tr),
-                subtitle: Text('offline.placeholder'.tr),
-              ),
-              const SizedBox(height: 24),
-              ExpansionTile(
-                title: Text('settings.about'.tr),
-                children: [
-                  ListTile(
-                    title: Text('settings.version'.tr),
-                    subtitle: Text('app.title'.tr),
-                  ),
-                  ListTile(
-                    title: Text('settings.tutorial'.tr),
-                    subtitle: Text('tutorial.step1'.tr),
-                  ),
-                  ListTile(
-                    title: Text('settings.quickActions'.tr),
-                    subtitle: Text('coach.start'.tr),
-                  ),
-                ],
-              ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
+              const SizedBox(height: 32),
+              Text('settings_about'.tr, style: theme.textTheme.bodyLarge),
             ],
-          )),
+          ),
+        ),
+      ),
     );
   }
 }

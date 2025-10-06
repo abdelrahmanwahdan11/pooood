@@ -1,29 +1,38 @@
-/*
-  هذا الملف يربط المسارات بوحدات GetX عبر الصفحات والبايندينغ.
-  يمكن إضافة صفحات جديدة أو تحديث الربط بسهولة عند توسيع التطبيق.
-*/
 import 'package:get/get.dart';
 
-import '../modules/additem/bindings/additem_binding.dart';
-import '../modules/additem/views/additem_view.dart';
-import '../modules/auth/bindings/auth_binding.dart';
-import '../modules/auth/views/login_view.dart';
-import '../modules/auth/views/signup_view.dart';
-import '../modules/details/bindings/details_binding.dart';
-import '../modules/details/views/details_view.dart';
-import '../modules/home/bindings/home_binding.dart';
+import '../modules/auth/forgot/forgot_binding.dart';
+import '../modules/auth/forgot/views/forgot_view.dart';
+import '../modules/auth/signin/signin_binding.dart';
+import '../modules/auth/signin/views/signin_view.dart';
+import '../modules/auth/signup/signup_binding.dart';
+import '../modules/auth/signup/views/signup_view.dart';
+import '../modules/compare/compare_binding.dart';
+import '../modules/compare/views/compare_view.dart';
+import '../modules/home/home_binding.dart';
 import '../modules/home/views/home_view.dart';
-import '../modules/mybids/bindings/mybids_binding.dart';
-import '../modules/mybids/views/mybids_view.dart';
-import '../modules/settings/bindings/settings_binding.dart';
+import '../modules/insights/insights_binding.dart';
+import '../modules/insights/views/insights_view.dart';
+import '../modules/invite/invite_binding.dart';
+import '../modules/invite/views/invite_view.dart';
+import '../modules/onboarding/onboarding_binding.dart';
+import '../modules/onboarding/views/onboarding_view.dart';
+import '../modules/profile/profile_binding.dart';
+import '../modules/profile/views/profile_view.dart';
+import '../modules/quiz/quiz_binding.dart';
+import '../modules/quiz/views/quiz_view.dart';
+import '../modules/results/results_binding.dart';
+import '../modules/results/views/results_view.dart';
+import '../modules/settings/settings_binding.dart';
 import '../modules/settings/views/settings_view.dart';
-import '../modules/splash/bindings/splash_binding.dart';
+import '../modules/splash/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
-import '../modules/wishlist/bindings/wishlist_binding.dart';
-import '../modules/wishlist/views/wishlist_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
+  AppPages._();
+
+  static const initial = AppRoutes.splash;
+
   static final routes = <GetPage<dynamic>>[
     GetPage(
       name: AppRoutes.splash,
@@ -31,52 +40,64 @@ class AppPages {
       binding: SplashBinding(),
     ),
     GetPage(
-      name: AppRoutes.login,
-      page: () => const LoginView(),
-      binding: AuthBinding(),
-      transition: Transition.fadeIn,
+      name: AppRoutes.onboarding,
+      page: () => const OnboardingView(),
+      binding: OnboardingBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.signin,
+      page: () => const SignInView(),
+      binding: SignInBinding(),
     ),
     GetPage(
       name: AppRoutes.signup,
-      page: () => const SignupView(),
-      binding: AuthBinding(),
-      transition: Transition.rightToLeft,
+      page: () => const SignUpView(),
+      binding: SignUpBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.forgot,
+      page: () => const ForgotView(),
+      binding: ForgotBinding(),
     ),
     GetPage(
       name: AppRoutes.home,
       page: () => const HomeView(),
       binding: HomeBinding(),
-      transition: Transition.zoom,
     ),
     GetPage(
-      name: AppRoutes.details,
-      page: () => const DetailsView(),
-      binding: DetailsBinding(),
-      transition: Transition.cupertino,
+      name: AppRoutes.quiz,
+      page: () => const QuizView(),
+      binding: QuizBinding(),
     ),
     GetPage(
-      name: AppRoutes.wishlist,
-      page: () => const WishlistView(),
-      binding: WishlistBinding(),
-      transition: Transition.fade,
+      name: AppRoutes.results,
+      page: () => const ResultsView(),
+      binding: ResultsBinding(),
     ),
     GetPage(
-      name: AppRoutes.myBids,
-      page: () => const MybidsView(),
-      binding: MybidsBinding(),
-      transition: Transition.downToUp,
+      name: AppRoutes.insights,
+      page: () => const InsightsView(),
+      binding: InsightsBinding(),
     ),
     GetPage(
-      name: AppRoutes.addItem,
-      page: () => const AdditemView(),
-      binding: AdditemBinding(),
-      transition: Transition.downToUp,
+      name: AppRoutes.compare,
+      page: () => const CompareView(),
+      binding: CompareBinding(),
     ),
     GetPage(
       name: AppRoutes.settings,
       page: () => const SettingsView(),
       binding: SettingsBinding(),
-      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => const ProfileView(),
+      binding: ProfileBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.invite,
+      page: () => const InviteView(),
+      binding: InviteBinding(),
     ),
   ];
 }
