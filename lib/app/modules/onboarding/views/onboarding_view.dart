@@ -81,17 +81,15 @@ class OnboardingView extends GetView<OnboardingController> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                Obx(
-                  () => SmoothPageIndicator(
-                    controller: controller.pageController,
-                    count: controller.slides.length,
-                    effect: ExpandingDotsEffect(
-                      dotColor: theme.colorScheme.primary.withOpacity(0.2),
-                      activeDotColor: theme.colorScheme.primary,
-                      dotHeight: 8,
-                      dotWidth: 8,
-                      spacing: 12,
-                    ),
+                SmoothPageIndicator(
+                  controller: controller.pageController,
+                  count: controller.slides.length,
+                  effect: ExpandingDotsEffect(
+                    dotColor: theme.colorScheme.primary.withOpacity(0.2),
+                    activeDotColor: theme.colorScheme.primary,
+                    dotHeight: 8,
+                    dotWidth: 8,
+                    spacing: 12,
                   ),
                 ),
                 const SizedBox(height: 24),

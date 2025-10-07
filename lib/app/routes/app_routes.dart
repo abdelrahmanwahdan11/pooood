@@ -14,4 +14,5 @@ class AppRoutes {
   static const settings = '/settings';
   static const profile = '/profile';
   static const invite = '/invite';
+  static const features = '/features';
 }

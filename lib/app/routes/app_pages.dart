@@ -10,6 +10,8 @@ import '../modules/compare/compare_binding.dart';
 import '../modules/compare/views/compare_view.dart';
 import '../modules/home/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/features/features_binding.dart';
+import '../modules/features/views/features_view.dart';
 import '../modules/insights/insights_binding.dart';
 import '../modules/insights/views/insights_view.dart';
 import '../modules/invite/invite_binding.dart';
@@ -98,6 +100,11 @@ class AppPages {
       name: AppRoutes.invite,
       page: () => const InviteView(),
       binding: InviteBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.features,
+      page: () => const FeaturesView(),
+      binding: FeaturesBinding(),
     ),
   ];
 }

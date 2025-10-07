@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/services/feature_service.dart';
 import '../../../core/utils/layout_helper.dart';
 import '../controllers/insights_controller.dart';
 
@@ -11,11 +12,55 @@ class InsightsView extends GetView<InsightsController> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final features = Get.find<FeatureService>();
+    final quickMood = features.isEnabled('quick_mood');
     return Scaffold(
-      appBar: AppBar(title: Text('home_insights'.tr)),
       body: LayoutHelper.constrain(
         child: Column(
           children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [theme.colorScheme.primary.withOpacity(0.18), theme.colorScheme.secondary.withOpacity(0.12)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(36)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SafeArea(
+                    bottom: false,
+                    child: Row(
+                      children: [
+                        IconButton(onPressed: Get.back, icon: const Icon(Icons.arrow_back_ios_new_rounded)),
+                        Text('home_insights'.tr, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text('insights_intro'.tr, style: theme.textTheme.bodyLarge?.copyWith(color: theme.hintColor)),
+                  if (quickMood) ...[
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 12,
+                      children: [
+                        for (final mood in ['emotions_joy', 'emotions_calm', 'emotions_anxiety'])
+                          ActionChip(
+                            label: Text(mood.tr),
+                            onPressed: () {
+                              controller.textController.text = mood.tr;
+                              controller.send();
+                            },
+                          ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -47,7 +92,7 @@ class InsightsView extends GetView<InsightsController> {
                                   constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
                                   decoration: BoxDecoration(
                                     color: isUser ? theme.colorScheme.primary : theme.cardColor,
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(24),
                                   ),
                                   child: Text(
                                     message.text,
@@ -62,7 +107,7 @@ class InsightsView extends GetView<InsightsController> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     Obx(
                       () {
                         final reading = controller.reading.value;
@@ -74,48 +119,61 @@ class InsightsView extends GetView<InsightsController> {
                           'emotions_anxiety'.tr: reading.anxiety,
                           'emotions_calm'.tr: reading.calm,
                         };
-                        return SizedBox(
-                          height: 200,
-                          child: BarChart(
-                            BarChartData(
-                              maxY: 100,
-                              gridData: FlGridData(show: true, horizontalInterval: 20),
-                              borderData: FlBorderData(show: false),
-                              titlesData: FlTitlesData(
-                                bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    getTitlesWidget: (value, meta) {
-                                      final index = value.toInt();
-                                      if (index >= values.length) return const SizedBox.shrink();
-                                      return Padding(
-                                        padding: const EdgeInsets.only(top: 8),
-                                        child: Text(values.keys.elementAt(index), style: theme.textTheme.labelSmall),
-                                      );
-                                    },
+                        return Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('feature_emotion_heatmap_title'.tr, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                              SizedBox(
+                                height: 180,
+                                child: BarChart(
+                                  BarChartData(
+                                    maxY: 100,
+                                    gridData: FlGridData(show: true, horizontalInterval: 20),
+                                    borderData: FlBorderData(show: false),
+                                    titlesData: FlTitlesData(
+                                      bottomTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: true,
+                                          getTitlesWidget: (value, meta) {
+                                            final index = value.toInt();
+                                            if (index >= values.length) return const SizedBox.shrink();
+                                            return Padding(
+                                              padding: const EdgeInsets.only(top: 8),
+                                              child: Text(values.keys.elementAt(index), style: theme.textTheme.labelSmall),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      leftTitles: AxisTitles(
+                                        sideTitles: SideTitles(showTitles: true, interval: 25),
+                                      ),
+                                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                    ),
+                                    barGroups: [
+                                      for (int i = 0; i < values.length; i++)
+                                        BarChartGroupData(
+                                          x: i,
+                                          barRods: [
+                                            BarChartRodData(
+                                              toY: values.values.elementAt(i).toDouble(),
+                                              color: theme.colorScheme.secondary,
+                                              width: 18,
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                          ],
+                                        )
+                                    ],
                                   ),
                                 ),
-                                leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: true, interval: 25),
-                                ),
-                                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                               ),
-                              barGroups: [
-                                for (int i = 0; i < values.length; i++)
-                                  BarChartGroupData(
-                                    x: i,
-                                    barRods: [
-                                      BarChartRodData(
-                                        toY: values.values.elementAt(i).toDouble(),
-                                        color: theme.colorScheme.secondary,
-                                        width: 18,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ],
-                                  )
-                              ],
-                            ),
+                            ],
                           ),
                         );
                       },
@@ -135,7 +193,7 @@ class InsightsView extends GetView<InsightsController> {
                       onChanged: controller.updateInput,
                       decoration: InputDecoration(
                         hintText: 'insights_placeholder'.tr,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
                         filled: true,
                       ),
                     ),

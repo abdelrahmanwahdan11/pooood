@@ -22,6 +22,41 @@ The project targets Android, iOS, Web, macOS, and Windows with a shared codebase
 - Comparison flow using shareable six-digit codes and highlights.
 - Settings module with instant locale/theme switches stored via `shared_preferences`.
 - Responsive layouts that adapt to phones, tablets, and web/desktop with RTL support.
+- Home hub redesigned around gradient cards, quick streaks, and a spotlight row for enabled experiments.
+- Profile editing sheet with persisted name/email plus a reflection streak tracker.
+
+### Experience Studio (30 feature toggles)
+
+- Daily reflection reminders
+- Weekly personality trends
+- Emotion intensity heatmap inside insights
+- Quick mood buttons for one-tap logging
+- Breathing micro-coach before intense sessions
+- Affirmation library aligned to OCEAN
+- Social share cards for results
+- Offline question bank for the quiz
+- Theme scheduler (light/dark automation)
+- Voice input for the chatbot
+- Conversation history recalls
+- Export report as PDF
+- Comparison timeline snapshots
+- Home screen widgets
+- Assistant shortcuts (Siri/Assistant)
+- Mindful haptics feedback
+- Inline quiz tips
+- Reverse scoring helper cues
+- Reflection streak tracker with reset control
+- Onboarding recaps on demand
+- Avatar gallery picker
+- High contrast mode for accessibility
+- Reduce motion toggle
+- Data control panel (text scaling clamp)
+- Sleep-friendly dark mode
+- Weekly notification digest
+- Notebook integration export
+- Custom question builder scaffolding
+- Focus mode to minimise distractions
+- Calendar sync reminders
 
 ## Language & Theme
 
