@@ -1,0 +1,34 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../../../routes/app_routes.dart';
+
+class SignInController extends GetxController {
+  final formKey = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final isLoading = false.obs;
+
+  @override
+  void onClose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.onClose();
+  }
+
+  Future<void> submit() async {
+    if (!(formKey.currentState?.validate() ?? false)) return;
+    isLoading.value = true;
+    await Future.delayed(const Duration(milliseconds: 800));
+    isLoading.value = false;
+    Get.offAllNamed(AppRoutes.home);
+  }
+
+  void goToSignup() {
+    Get.toNamed(AppRoutes.signup);
+  }
+
+  void goToForgot() {
+    Get.toNamed(AppRoutes.forgot);
+  }
+}

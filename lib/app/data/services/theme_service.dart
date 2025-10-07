@@ -1,22 +1,24 @@
-/*
-  هذا الملف يقدّم خدمة تفضيلات الثيم لحفظ وضع الإضاءة في SharedPreferences.
-  يمكن توسيعه لتخزين تفضيلات أخرى مثل حجم الخط أو لغة النظام.
-*/
 import 'package:get/get.dart';
-
-import 'storage_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemePreferencesService extends GetxService {
-  static ThemePreferencesService get to => Get.find<ThemePreferencesService>();
+  static const _keyThemeMode = 'theme_mode';
 
-  Future<void> saveThemeMode(String mode) async {
-    final settings = StorageService.to.getSettings();
-    settings['theme_mode'] = mode;
-    await StorageService.to.saveSettings(settings);
+  static ThemePreferencesService get to =>
+      Get.find<ThemePreferencesService>();
+
+  late SharedPreferences _prefs;
+
+  Future<ThemePreferencesService> init() async {
+    _prefs = await SharedPreferences.getInstance();
+    return this;
   }
 
   String? getThemeMode() {
-    final settings = StorageService.to.getSettings();
-    return settings['theme_mode'] as String?;
+    return _prefs.getString(_keyThemeMode);
+  }
+
+  Future<void> saveThemeMode(String value) async {
+    await _prefs.setString(_keyThemeMode, value);
   }
 }
